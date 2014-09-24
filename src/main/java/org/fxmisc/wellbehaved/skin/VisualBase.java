@@ -1,5 +1,6 @@
 package org.fxmisc.wellbehaved.skin;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.control.Control;
 import javafx.scene.input.InputEvent;
@@ -14,13 +15,8 @@ abstract class VisualBase<C extends Control> implements Visual<C> {
     }
 
     @Override
-    public final EventHandler<? super InputEvent> getOnInput() {
-        return helper.getOnInput();
-    }
-
-    @Override
-    public final void setOnInput(EventHandler<? super InputEvent> handler) {
-        helper.setOnInput(handler);
+    public final ObjectProperty<EventHandler<? super InputEvent>> onInputProperty() {
+        return helper.onInputProperty();
     }
 
     @Override

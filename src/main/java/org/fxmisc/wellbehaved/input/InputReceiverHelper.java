@@ -1,38 +1,38 @@
 package org.fxmisc.wellbehaved.input;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.InputEvent;
 
 public final class InputReceiverHelper<T extends Node> implements InputReceiver {
-    private final T target;
 
-    private EventHandler<? super InputEvent> handler = EventHandlerHelper.empty();
+    private final ObjectProperty<EventHandler<? super InputEvent>> onInput
+            = new SimpleObjectProperty<>(EventHandlerHelper.empty());
+
+    private final T target;
 
     public InputReceiverHelper(T target) {
         this.target = target;
+        onInput.addListener((obs, oldHandler, newHandler) -> {
+            if(oldHandler != EventHandlerHelper.empty()) {
+                target.removeEventHandler(InputEvent.ANY, oldHandler);
+            }
+
+            if(newHandler != EventHandlerHelper.empty()) {
+                target.addEventHandler(InputEvent.ANY, newHandler);
+            }
+        });
+    }
+
+    @Override
+    public ObjectProperty<EventHandler<? super InputEvent>> onInputProperty() {
+        return onInput;
     }
 
     public T getTarget() {
         return target;
-    }
-
-    @Override
-    public EventHandler<? super InputEvent> getOnInput() {
-        return handler;
-    }
-
-    @Override
-    public void setOnInput(EventHandler<? super InputEvent> handler) {
-        if(this.handler != EventHandlerHelper.empty()) {
-            target.removeEventHandler(InputEvent.ANY, handler);
-        }
-
-        if(handler != EventHandlerHelper.empty()) {
-            target.addEventHandler(InputEvent.ANY, handler);
-        }
-
-        this.handler = handler;
     }
 
     public void dispose() {
