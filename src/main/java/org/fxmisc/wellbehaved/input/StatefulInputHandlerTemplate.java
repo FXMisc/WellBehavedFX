@@ -18,10 +18,10 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-public final class StatefulInputHandlerTemplate<T extends InputReceiver, S> implements InputHandlerTemplate<T> {
+public final class StatefulInputHandlerTemplate<T, S> implements InputHandlerTemplate<T> {
 
     @FunctionalInterface
-    public interface StateTransition<T extends InputReceiver, S, E extends InputEvent> {
+    public interface StateTransition<T, S, E extends InputEvent> {
         S transition(T target, S state, E event);
     }
 
@@ -32,7 +32,7 @@ public final class StatefulInputHandlerTemplate<T extends InputReceiver, S> impl
      * returned state should be unchanged.
      */
     @FunctionalInterface
-    public interface StateTransitioningHandler<T extends InputReceiver, S> {
+    public interface StateTransitioningHandler<T, S> {
         S handle(T target, S state, InputEvent event);
 
         default <U extends T> StateTransitioningHandler<U, S> orElse(StateTransitioningHandler<? super U, S> nextHandler) {
@@ -59,12 +59,12 @@ public final class StatefulInputHandlerTemplate<T extends InputReceiver, S> impl
         }
     }
 
-    public static abstract class Builder<T extends InputReceiver, S> {
+    public static abstract class Builder<T, S> {
 
-        private static <S> Builder<InputReceiver, S> empty() {
-            return new Builder<InputReceiver, S>() {
+        private static <S> Builder<Object, S> empty() {
+            return new Builder<Object, S>() {
                 @Override
-                <U extends InputReceiver> List<StateTransitioningHandler<? super U, S>> getHandlers(
+                <U> List<StateTransitioningHandler<? super U, S>> getHandlers(
                         int additionalCapacity) {
                     return new ArrayList<>(additionalCapacity);
                 }
@@ -139,7 +139,7 @@ public final class StatefulInputHandlerTemplate<T extends InputReceiver, S> impl
         abstract <U extends T> List<StateTransitioningHandler<? super U, S>> getHandlers(int additionalCapacity);
     }
 
-    private static class CompositeBuilder<T extends InputReceiver, S> extends Builder<T, S> {
+    private static class CompositeBuilder<T, S> extends Builder<T, S> {
         private final Builder<? super T, S> previousBuilder;
         private final StateTransitioningHandler<? super T, S> handler;
 
@@ -159,7 +159,7 @@ public final class StatefulInputHandlerTemplate<T extends InputReceiver, S> impl
         }
     }
 
-    public static class On<T extends InputReceiver, S, E extends InputEvent> {
+    public static class On<T, S, E extends InputEvent> {
         private final Builder<? super T, S> previousBuilder;
         private final EventPattern<? super InputEvent, E> eventMatcher;
 
@@ -199,7 +199,7 @@ public final class StatefulInputHandlerTemplate<T extends InputReceiver, S> impl
         }
     }
 
-    public static class When<T extends InputReceiver, S, E extends InputEvent> {
+    public static class When<T, S, E extends InputEvent> {
         private final Builder<? super T, S> previousBuilder;
         private final EventPattern<? super InputEvent, E> eventMatcher;
         private final BiPredicate<? super T, ? super S> condition;
@@ -232,44 +232,44 @@ public final class StatefulInputHandlerTemplate<T extends InputReceiver, S> impl
         }
     }
 
-    public static <E extends InputEvent, S> On<InputReceiver, S, E> on(
+    public static <E extends InputEvent, S> On<Object, S, E> on(
             EventPattern<? super InputEvent, E> eventMatcher) {
         return Builder.<S>empty().on(eventMatcher);
     }
 
-    public static <E extends InputEvent, S> On<InputReceiver, S, E> on(EventType<E> eventType) {
+    public static <E extends InputEvent, S> On<Object, S, E> on(EventType<E> eventType) {
         return Builder.<S>empty().on(eventType);
     }
 
-    public static <S> On<InputReceiver, S, KeyEvent> onPressed(KeyCombination combination) {
+    public static <S> On<Object, S, KeyEvent> onPressed(KeyCombination combination) {
         return Builder.<S>empty().onPressed(combination);
     }
 
-    public static <S> On<InputReceiver, S, KeyEvent> onPressed(KeyCode code, KeyCombination.Modifier... modifiers) {
+    public static <S> On<Object, S, KeyEvent> onPressed(KeyCode code, KeyCombination.Modifier... modifiers) {
         return Builder.<S>empty().onPressed(code, modifiers);
     }
 
-    public static <S> On<InputReceiver, S, KeyEvent> onPressed(String character, KeyCombination.Modifier... modifiers) {
+    public static <S> On<Object, S, KeyEvent> onPressed(String character, KeyCombination.Modifier... modifiers) {
         return Builder.<S>empty().onPressed(character, modifiers);
     }
 
-    public static <S> On<InputReceiver, S, KeyEvent> onReleased(KeyCombination combination) {
+    public static <S> On<Object, S, KeyEvent> onReleased(KeyCombination combination) {
         return Builder.<S>empty().onReleased(combination);
     }
 
-    public static <S> On<InputReceiver, S, KeyEvent> onReleased(KeyCode code, KeyCombination.Modifier... modifiers) {
+    public static <S> On<Object, S, KeyEvent> onReleased(KeyCode code, KeyCombination.Modifier... modifiers) {
         return Builder.<S>empty().onReleased(code, modifiers);
     }
 
-    public static <S> On<InputReceiver, S, KeyEvent> onReleased(String character, KeyCombination.Modifier... modifiers) {
+    public static <S> On<Object, S, KeyEvent> onReleased(String character, KeyCombination.Modifier... modifiers) {
         return Builder.<S>empty().onReleased(character, modifiers);
     }
 
-    public static <S> On<InputReceiver, S, KeyEvent> onTyped(String character, KeyCombination.Modifier... modifiers) {
+    public static <S> On<Object, S, KeyEvent> onTyped(String character, KeyCombination.Modifier... modifiers) {
         return Builder.<S>empty().onTyped(character, modifiers);
     }
 
-    public static <T extends InputReceiver, S> Builder<T, S>
+    public static <T, S> Builder<T, S>
     startWith(StateTransitioningHandler<? super T, S> handler) {
         return Builder.<S>empty().addHandler(handler);
     }

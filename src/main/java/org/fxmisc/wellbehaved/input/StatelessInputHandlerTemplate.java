@@ -19,13 +19,13 @@ import javafx.scene.input.KeyEvent;
  *
  * @param <T> type of the control the input handler applies to.
  */
-public abstract class StatelessInputHandlerTemplate<T extends InputReceiver> implements InputHandlerTemplate<T>, BiConsumer<T, InputEvent> {
+public abstract class StatelessInputHandlerTemplate<T> implements InputHandlerTemplate<T>, BiConsumer<T, InputEvent> {
 
-    public static abstract class Builder<T extends InputReceiver> {
-        private static Builder<InputReceiver> empty() {
-            return new Builder<InputReceiver>() {
+    public static abstract class Builder<T> {
+        private static Builder<Object> empty() {
+            return new Builder<Object>() {
                 @Override
-                <U extends InputReceiver> List<BiConsumer<? super U, ? super InputEvent>> getHandlers(int additionalCapacity) {
+                <U> List<BiConsumer<? super U, ? super InputEvent>> getHandlers(int additionalCapacity) {
                     return new ArrayList<>(additionalCapacity);
                 }
             };
@@ -98,7 +98,7 @@ public abstract class StatelessInputHandlerTemplate<T extends InputReceiver> imp
         abstract <U extends T> List<BiConsumer<? super U, ? super InputEvent>> getHandlers(int additionalCapacity);
     }
 
-    private static class CompositeBuilder<T extends InputReceiver> extends Builder<T> {
+    private static class CompositeBuilder<T> extends Builder<T> {
         private final Builder<? super T> previousBuilder;
         private final BiConsumer<? super T, ? super InputEvent> handler;
 
@@ -117,7 +117,7 @@ public abstract class StatelessInputHandlerTemplate<T extends InputReceiver> imp
         }
     }
 
-    public static class On<T extends InputReceiver, E extends InputEvent> {
+    public static class On<T, E extends InputEvent> {
         private final Builder<? super T> previousBuilder;
         private final EventPattern<? super InputEvent, E> eventMatcher;
 
@@ -144,7 +144,7 @@ public abstract class StatelessInputHandlerTemplate<T extends InputReceiver> imp
         }
     }
 
-    public static class When<T extends InputReceiver, E extends InputEvent> {
+    public static class When<T, E extends InputEvent> {
         private final Builder<? super T> previousBuilder;
         private final EventPattern<? super InputEvent, E> eventMatcher;
         private final Predicate<? super T> condition;
@@ -170,44 +170,44 @@ public abstract class StatelessInputHandlerTemplate<T extends InputReceiver> imp
         }
     }
 
-    public static <E extends InputEvent> On<InputReceiver, E> on(
+    public static <E extends InputEvent> On<Object, E> on(
             EventPattern<? super InputEvent, E> eventMatcher) {
         return Builder.empty().on(eventMatcher);
     }
 
-    public static <E extends InputEvent> On<InputReceiver, E> on(EventType<E> eventType) {
+    public static <E extends InputEvent> On<Object, E> on(EventType<E> eventType) {
         return Builder.empty().on(eventType);
     }
 
-    public static On<InputReceiver, KeyEvent> onPressed(KeyCombination combination) {
+    public static On<Object, KeyEvent> onPressed(KeyCombination combination) {
         return Builder.empty().onPressed(combination);
     }
 
-    public static On<InputReceiver, KeyEvent> onPressed(KeyCode code, KeyCombination.Modifier... modifiers) {
+    public static On<Object, KeyEvent> onPressed(KeyCode code, KeyCombination.Modifier... modifiers) {
         return Builder.empty().onPressed(code, modifiers);
     }
 
-    public static On<InputReceiver, KeyEvent> onPressed(String character, KeyCombination.Modifier... modifiers) {
+    public static On<Object, KeyEvent> onPressed(String character, KeyCombination.Modifier... modifiers) {
         return Builder.empty().onPressed(character, modifiers);
     }
 
-    public static On<InputReceiver, KeyEvent> onReleased(KeyCombination combination) {
+    public static On<Object, KeyEvent> onReleased(KeyCombination combination) {
         return Builder.empty().onReleased(combination);
     }
 
-    public static On<InputReceiver, KeyEvent> onReleased(KeyCode code, KeyCombination.Modifier... modifiers) {
+    public static On<Object, KeyEvent> onReleased(KeyCode code, KeyCombination.Modifier... modifiers) {
         return Builder.empty().onReleased(code, modifiers);
     }
 
-    public static On<InputReceiver, KeyEvent> onReleased(String character, KeyCombination.Modifier... modifiers) {
+    public static On<Object, KeyEvent> onReleased(String character, KeyCombination.Modifier... modifiers) {
         return Builder.empty().onReleased(character, modifiers);
     }
 
-    public static On<InputReceiver, KeyEvent> onTyped(String character, KeyCombination.Modifier... modifiers) {
+    public static On<Object, KeyEvent> onTyped(String character, KeyCombination.Modifier... modifiers) {
         return Builder.empty().onTyped(character, modifiers);
     }
 
-    public static <T extends InputReceiver> Builder<T>
+    public static <T> Builder<T>
     startWith(BiConsumer<? super T, ? super InputEvent> handler) {
         return Builder.empty().addHandler(handler);
     }

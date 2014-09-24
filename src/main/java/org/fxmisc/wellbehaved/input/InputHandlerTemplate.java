@@ -6,7 +6,7 @@ import javafx.event.EventHandler;
 import javafx.scene.input.InputEvent;
 
 @FunctionalInterface
-public interface InputHandlerTemplate<T extends InputReceiver> {
+public interface InputHandlerTemplate<T> {
     BiConsumer<? super T, ? super InputEvent> getHandler();
 
     default EventHandler<InputEvent> bind(T target) {
