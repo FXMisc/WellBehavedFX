@@ -2,26 +2,16 @@ package org.fxmisc.wellbehaved.input;
 
 import java.util.function.BiConsumer;
 
+import javafx.event.EventHandler;
 import javafx.scene.input.InputEvent;
 
 @FunctionalInterface
 public interface InputHandlerTemplate<T extends InputReceiver> {
     BiConsumer<? super T, ? super InputEvent> getHandler();
 
-    default AffinedEventHandler bind(T target) {
+    default EventHandler<InputEvent> bind(T target) {
         BiConsumer<? super T, ? super InputEvent> handler = getHandler();
-        return new AffinedEventHandler() {
-
-            @Override
-            public void handle(InputEvent event) {
-                handler.accept(target, event);
-            }
-
-            @Override
-            public InputReceiver getTarget() {
-                return target;
-            }
-        };
+        return event -> handler.accept(target, event);
     }
 
     default <U extends T> InputHandlerTemplate<U> orElse(InputHandlerTemplate<U> that) {

@@ -3,6 +3,7 @@ package org.fxmisc.wellbehaved.input;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 
@@ -26,7 +27,7 @@ public final class EventHandlerHelper<T extends Event> {
     }
 
     @SafeVarargs
-    static <T extends Event> EventHandler<? super T> chain(EventHandler<? super T>... handlers) {
+    public static <T extends Event> EventHandler<? super T> chain(EventHandler<? super T>... handlers) {
         List<EventHandler<? super T>> nonEmptyHandlers = new ArrayList<>(handlers.length);
         for(EventHandler<? super T> handler: handlers) {
             if(handler != empty()) {
@@ -42,7 +43,7 @@ public final class EventHandlerHelper<T extends Event> {
         }
     }
 
-    static <T extends Event> EventHandler<? super T> exclude(EventHandler<T> handler, EventHandler<?> subHandler) {
+    public static <T extends Event> EventHandler<? super T> exclude(EventHandler<T> handler, EventHandler<?> subHandler) {
         if(handler instanceof CompositeEventHandler) {
             return ((CompositeEventHandler<T>) handler).without(subHandler);
         } else if(handler.equals(subHandler)) {
@@ -50,6 +51,20 @@ public final class EventHandlerHelper<T extends Event> {
         } else {
             return handler;
         }
+    }
+
+    public static <T extends Event> void install(
+            ObjectProperty<EventHandler<? super T>> property,
+            EventHandler<? super T> handler) {
+        EventHandler<? super T> oldHandler = property.get();
+        property.set(EventHandlerHelper.chain(handler, oldHandler));
+    }
+
+    public static <T extends Event> void remove(
+            ObjectProperty<EventHandler<? super T>> property,
+            EventHandler<? super T> handler) {
+        EventHandler<? super T> oldHandler = property.get();
+        property.set(EventHandlerHelper.exclude(oldHandler, handler));
     }
 
     // prevent instantiation
