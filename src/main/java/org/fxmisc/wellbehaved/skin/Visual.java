@@ -3,11 +3,12 @@ package org.fxmisc.wellbehaved.skin;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
+import javafx.event.EventHandler;
 import javafx.scene.control.Control;
-
-import org.fxmisc.wellbehaved.input.InputReceiver;
+import javafx.scene.input.InputEvent;
 
 /**
  * Represents the view aspect of a JavaFX control. It defines how the control
@@ -16,7 +17,7 @@ import org.fxmisc.wellbehaved.input.InputReceiver;
  *
  * @param <C> type of the control this Visual is used for.
  */
-public interface Visual<C extends Control> extends InputReceiver {
+public interface Visual<C extends Control> {
     /**
      * Returns the control this Visual is used for.
      */
@@ -28,6 +29,18 @@ public interface Visual<C extends Control> extends InputReceiver {
      * remove any listeners, etc.
      */
     void dispose();
+
+    /**
+     * Defines a function to be called when this visual's control receives
+     * input.
+     */
+    ObjectProperty<EventHandler<? super InputEvent>> onInputProperty();
+    default EventHandler<? super InputEvent> getOnInput() {
+        return onInputProperty().get();
+    }
+    default void setOnInput(EventHandler<? super InputEvent> handler) {
+        onInputProperty().set(handler);
+    }
 
     /**
      * Returns information about the extra styleable properties availabe on the

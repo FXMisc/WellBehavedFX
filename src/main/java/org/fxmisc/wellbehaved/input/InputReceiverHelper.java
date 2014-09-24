@@ -6,7 +6,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.InputEvent;
 
-public final class InputReceiverHelper<T extends Node> implements InputReceiver {
+public final class InputReceiverHelper<T extends Node> {
 
     private final ObjectProperty<EventHandler<? super InputEvent>> onInput
             = new SimpleObjectProperty<>(EventHandlerHelper.empty());
@@ -26,7 +26,6 @@ public final class InputReceiverHelper<T extends Node> implements InputReceiver 
         });
     }
 
-    @Override
     public ObjectProperty<EventHandler<? super InputEvent>> onInputProperty() {
         return onInput;
     }
@@ -36,6 +35,6 @@ public final class InputReceiverHelper<T extends Node> implements InputReceiver 
     }
 
     public void dispose() {
-        setOnInput(EventHandlerHelper.empty());
+        onInput.set(EventHandlerHelper.empty());
     }
 }
