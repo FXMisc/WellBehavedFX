@@ -5,6 +5,8 @@ This project tries to help with two (related) aspects of JavaFX development:
 
  * defining and overriding event handlers (e.g. keyboard shortcuts); and
  * implementing skins for JavaFX controls according to the MVC pattern.
+ 
+If you like the approach taken here and want something like this in JavaFX, [RT-21598](https://javafx-jira.kenai.com/browse/RT-21598) is the place to discuss.
 
 
 Builder Pattern for Event Handlers
