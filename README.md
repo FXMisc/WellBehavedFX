@@ -103,7 +103,8 @@ libraryDependencies += "org.fxmisc.wellbehaved" % "wellbehavedfx" % "0.1-SNAPSHO
 [Download](https://oss.sonatype.org/content/repositories/snapshots/org/fxmisc/wellbehaved/wellbehavedfx/0.1-SNAPSHOT/) the latest JAR file and place it on your classpath.
 
 
-License
+Links
 -------
 
-[BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
+License: [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)  
+API documentation: [Javadoc](http://www.fxmisc.org/wellbehaved/javadoc/overview-summary.html)  
