@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.input;
+package org.fxmisc.wellbehaved.event;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

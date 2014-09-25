@@ -17,7 +17,7 @@ WellBehavedFX provides builder-style API to define `EventHandler`s.
 ```java
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
-import static org.fxmisc.wellbehaved.input.EventPattern.*;
+import static org.fxmisc.wellbehaved.event.EventPattern.*;
 
 EventHandler<? super KeyEvent> keyPressedHandler = EventHandlerHelper
         .on(keyPressed(O, CONTROL_DOWN))            .act(event -> open())

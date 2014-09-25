@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.input;
+package org.fxmisc.wellbehaved.event;
 
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyEvent.*;

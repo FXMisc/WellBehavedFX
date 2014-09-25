@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.input;
+package org.fxmisc.wellbehaved.event;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,9 @@
-package org.fxmisc.wellbehaved.input;
+package org.fxmisc.wellbehaved.event;
 
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
 import static javafx.scene.input.KeyEvent.*;
-import static org.fxmisc.wellbehaved.input.EventPattern.*;
+import static org.fxmisc.wellbehaved.event.EventPattern.*;
 import static org.junit.Assert.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
