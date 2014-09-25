@@ -63,7 +63,8 @@ TBD
 Skin Scaffolding
 ----------------
 
-TBD
+TBD  
+Have a look at [this blog post](http://tomasmikula.github.io/blog/2014/06/11/separation-of-view-and-controller-in-javafx-controls.html) for the general idea.
 
 
 Download
