@@ -2,10 +2,13 @@ package org.fxmisc.wellbehaved.input;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 
 /**
  * Methods of this class could be added directly to the {@link EventHandler}
@@ -22,13 +25,110 @@ import javafx.event.EventHandler;
  */
 public final class EventHandlerHelper<T extends Event> {
 
+    public static abstract class Builder<T extends Event> {
+
+        private static <T extends Event> Builder<T> empty() {
+            return new Builder<T>() {
+                @Override
+                <U extends T> List<EventHandler<? super U>> getHandlers(int additionalCapacity) {
+                    return new ArrayList<>(additionalCapacity);
+                }
+            };
+        }
+
+        // private constructor to prevent subclassing by the user
+        private Builder() {}
+
+        public <U extends T> On<T, U> on(EventPattern<? super T, ? extends U> eventMatcher) {
+            return new On<>(this, eventMatcher);
+        }
+
+        public <U extends T> On<T, U> on(EventType<? extends U> eventType) {
+            return on(EventPattern.eventTypePattern(eventType));
+        }
+
+        public <U extends T> Builder<U> addHandler(EventHandler<? super U> handler) {
+            return new CompositeBuilder<>(this, handler);
+        }
+
+        public final EventHandler<T> create() {
+            List<EventHandler<? super T>> handlers = getHandlers();
+            return new CompositeEventHandler<>(handlers);
+        }
+
+        List<EventHandler<? super T>> getHandlers() {
+            return getHandlers(0);
+        }
+
+        abstract <U extends T> List<EventHandler<? super U>> getHandlers(int additionalCapacity);
+    }
+
+    private static class CompositeBuilder<T extends Event> extends Builder<T> {
+        private final Builder<? super T> previousBuilder;
+        private final EventHandler<? super T> handler;
+
+        private CompositeBuilder(
+                Builder<? super T> previousBuilder,
+                EventHandler<? super T> handler) {
+            this.previousBuilder = previousBuilder;
+            this.handler = handler;
+        }
+
+        @Override
+        <U extends T> List<EventHandler<? super U>> getHandlers(int additionalCapacity) {
+            List<EventHandler<? super U>> handlers = previousBuilder.getHandlers(additionalCapacity + 1);
+            handlers.add(handler);
+            return handlers;
+        }
+    }
+
+    public static class On<T extends Event, U extends T> {
+        private final Builder<? super T> previousBuilder;
+        private final EventPattern<? super T, ? extends U> eventMatcher;
+
+        private On(
+                Builder<? super T> previous,
+                EventPattern<? super T, ? extends U> eventMatcher) {
+            this.previousBuilder = previous;
+            this.eventMatcher = eventMatcher;
+        }
+
+        public On<T, U> where(Predicate<? super U> condition) {
+            return new On<>(previousBuilder, eventMatcher.and(condition));
+        }
+
+        public Builder<T> act(Consumer<? super U> action) {
+            return previousBuilder.addHandler(t -> {
+                eventMatcher.match(t).ifPresent(u -> {
+                    action.accept(u);
+                    t.consume();
+                });
+            });
+        }
+    }
+
+    public static <T extends Event, U extends T> On<T, U> on(
+            EventPattern<? super T, ? extends U> eventMatcher) {
+        return Builder.<T>empty().on(eventMatcher);
+    }
+
+    public static <T extends Event> On<Event, T> on(
+            EventType<? extends T> eventType) {
+        return Builder.empty().on(eventType);
+    }
+
+    public static <T extends Event> Builder<T>
+    startWith(EventHandler<? super T> handler) {
+        return Builder.empty().addHandler(handler);
+    }
+
     static <T extends Event> EventHandler<T> empty() {
         return EmptyEventHandler.instance();
     }
 
     @SafeVarargs
     public static <T extends Event> EventHandler<? super T> chain(EventHandler<? super T>... handlers) {
-        List<EventHandler<? super T>> nonEmptyHandlers = new ArrayList<>(handlers.length);
+        ArrayList<EventHandler<? super T>> nonEmptyHandlers = new ArrayList<>(handlers.length);
         for(EventHandler<? super T> handler: handlers) {
             if(handler != empty()) {
                 nonEmptyHandlers.add(handler);
@@ -39,6 +139,7 @@ public final class EventHandlerHelper<T extends Event> {
         } else if(nonEmptyHandlers.size() == 1) {
             return nonEmptyHandlers.get(0);
         } else {
+            nonEmptyHandlers.trimToSize();
             return new CompositeEventHandler<>(nonEmptyHandlers);
         }
     }
