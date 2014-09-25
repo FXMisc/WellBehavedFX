@@ -5,13 +5,13 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Control;
 import javafx.scene.input.InputEvent;
 
-import org.fxmisc.wellbehaved.input.EventReceiverHelper;
+import org.fxmisc.wellbehaved.input.EventSourceHelper;
 
 abstract class VisualBase<C extends Control> implements Visual<C> {
-    private final EventReceiverHelper<C, InputEvent> helper;
+    private final EventSourceHelper<C, InputEvent> helper;
 
     VisualBase(C control) {
-        this.helper = new EventReceiverHelper<>(control, InputEvent.ANY);
+        this.helper = EventSourceHelper.forNode(control, InputEvent.ANY);
     }
 
     @Override
@@ -21,7 +21,7 @@ abstract class VisualBase<C extends Control> implements Visual<C> {
 
     @Override
     public final C getControl() {
-        return helper.getTarget();
+        return helper.getEventSource();
     }
 
     @Override
