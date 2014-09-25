@@ -155,17 +155,23 @@ public final class EventHandlerHelper<T extends Event> {
     }
 
     public static <T extends Event> void install(
-            ObjectProperty<EventHandler<? super T>> property,
+            ObjectProperty<EventHandler<? super T>> handlerProperty,
             EventHandler<? super T> handler) {
-        EventHandler<? super T> oldHandler = property.get();
-        property.set(EventHandlerHelper.chain(handler, oldHandler));
+        EventHandler<? super T> oldHandler = handlerProperty.get();
+        if(oldHandler != null) {
+            handlerProperty.set(EventHandlerHelper.chain(handler, oldHandler));
+        } else {
+            handlerProperty.set(handler);
+        }
     }
 
     public static <T extends Event> void remove(
-            ObjectProperty<EventHandler<? super T>> property,
+            ObjectProperty<EventHandler<? super T>> handlerProperty,
             EventHandler<? super T> handler) {
-        EventHandler<? super T> oldHandler = property.get();
-        property.set(EventHandlerHelper.exclude(oldHandler, handler));
+        EventHandler<? super T> oldHandler = handlerProperty.get();
+        if(oldHandler != null) {
+            handlerProperty.set(EventHandlerHelper.exclude(oldHandler, handler));
+        }
     }
 
     // prevent instantiation
