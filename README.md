@@ -70,37 +70,29 @@ Have a look at [this blog post](http://tomasmikula.github.io/blog/2014/06/11/sep
 Download
 --------
 
-Maven artifacts are deployed to Sonatype OSS snapshot repository with the given Maven coordinates:
+Maven artifacts are deployed to Maven Central repository with the following Maven coordinates:
 
-| Group ID               | Artifact ID    | Version      |
-| :--------------------: | :------------: | :----------: |
-| org.fxmisc.wellbehaved | wellbehavedfx  | 0.1-SNAPSHOT |
+| Group ID               | Artifact ID    | Version |
+| :--------------------: | :------------: | :-----: |
+| org.fxmisc.wellbehaved | wellbehavedfx  | 0.1     |
 
 ### Gradle example
 
 ```groovy
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/' 
-    }
-}
-
 dependencies {
-    compile group: 'org.fxmisc.wellbehaved', name: 'wellbehavedfx', version: '0.1-SNAPSHOT'
+    compile group: 'org.fxmisc.wellbehaved', name: 'wellbehavedfx', version: '0.1'
 }
 ```
 
 ### Sbt example
 
 ```scala
-resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-
-libraryDependencies += "org.fxmisc.wellbehaved" % "wellbehavedfx" % "0.1-SNAPSHOT"
+libraryDependencies += "org.fxmisc.wellbehaved" % "wellbehavedfx" % "0.1"
 ```
 
 ### Manual download
 
-[Download](https://oss.sonatype.org/content/repositories/snapshots/org/fxmisc/wellbehaved/wellbehavedfx/0.1-SNAPSHOT/) the latest JAR file and place it on your classpath.
+[Download](https://oss.sonatype.org/content/groups/public/org/fxmisc/wellbehaved/wellbehavedfx/0.1/) the JAR file and place it on your classpath.
 
 
 Links
