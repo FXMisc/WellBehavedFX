@@ -165,6 +165,17 @@ public final class EventHandlerHelper<T extends Event> {
         }
     }
 
+    public static <T extends Event> void installAfter(
+            ObjectProperty<EventHandler<? super T>> handlerProperty,
+            EventHandler<? super T> handler) {
+        EventHandler<? super T> oldHandler = handlerProperty.get();
+        if(oldHandler != null) {
+            handlerProperty.set(EventHandlerHelper.chain(oldHandler, handler));
+        } else {
+            handlerProperty.set(handler);
+        }
+    }
+
     public static <T extends Event> void remove(
             ObjectProperty<EventHandler<? super T>> handlerProperty,
             EventHandler<? super T> handler) {
