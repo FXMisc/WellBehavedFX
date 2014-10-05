@@ -53,6 +53,8 @@ EventHandlerHelper.remove(textArea.onKeyPressedProperty(), keyPressedHandler);
 
 Now the handler that remains installed on `textArea` first invokes `anotherHandler`, and if it does not consume the event, `textArea`s original handler (if any) is invoked.
 
+See also feature request [RT-38898](https://javafx-jira.kenai.com/browse/RT-38898) to add (de)composition methods directly to the `EventHandler` interface.
+
 
 Event Handler Templates
 -----------------------
