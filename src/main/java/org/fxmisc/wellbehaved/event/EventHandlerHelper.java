@@ -211,6 +211,9 @@ class CompositeEventHandler<T extends Event> implements EventHandler<T> {
     private final List<EventHandler<? super T>> handlers;
 
     CompositeEventHandler(List<EventHandler<? super T>> handlers) {
+        // Since this constructor is package-private, we can be sure that
+        // the given list of handlers is never mutated, thus there is no need
+        // to create a copy.
         this.handlers = handlers;
     }
 
@@ -250,5 +253,16 @@ class CompositeEventHandler<T extends Event> implements EventHandler<T> {
                 return new CompositeEventHandler<>(newHandlers);
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof CompositeEventHandler
+                && this.handlers.equals(((CompositeEventHandler<?>) other).handlers);
+    }
+
+    @Override
+    public int hashCode() {
+        return handlers.hashCode();
     }
 }
