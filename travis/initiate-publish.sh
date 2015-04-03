@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ "$TRAVIS_REPO_SLUG" == "TomasMikula/WellBehavedFX" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
-  if [[ $(./gradlew -q getVersion) != *SNAPSHOT* ]]; then
+  if [[ $(gradle -q getVersion) != *SNAPSHOT* ]]; then
       echo 'Travis can only publish snapshots.'
-      return 0
+      exit 0
   fi
 
   echo -e "Starting publish to Sonatype...\n"
