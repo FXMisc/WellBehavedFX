@@ -5,20 +5,12 @@ import static javafx.scene.input.KeyEvent.*;
 import static org.junit.Assert.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HandlerCompositionTest {
-
-    @BeforeClass
-    public static void setUpBeforeClass() {
-        // initialize JavaFX
-        new JFXPanel();
-    }
 
     @Test
     public void test() {
