@@ -12,3 +12,13 @@ sudo: false
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+
+# add Sonatype credentials
+env:
+  global:
+    - secure: "VERCkAdb227BvYQfU5i5VbEqsM8uK9MRumUqlY402Pz/eIUp5qenIE6BGKOOZvNnsEwbuTGDaS5OTQeFchWMsrv1Zv0k/2Klpxgy/UdOWXgwk3qWv9pAl5Xn0+cSKKS/X7V5j8wXUlBzFVIBTrjJ1KNwKgqguL5V8t1nJhLrH5o="
+    - secure: "er/TMvUHDBuZ8Mmj1/Z4NlpQiXoTUhL2aumt7y4qCCwQEV8lRrWXR79GVg2X6tlzTyUTUcurlvLwqvGceW+Vh60I52xTH8oFPsf1uPmJXv78qJ2ZRAzxjQkBO+OnKOVEU+69aKdRt/NymEtTUxVsTHi60tRVNzm0LYFcFYlO1JQ="
+
+# publish artifacts after a successful build
+after_success:
+  - travis/initiate-publish.sh

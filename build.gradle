@@ -32,3 +32,7 @@ javadoc {
     // ignore missing Javadoc comments or tags
     options.addStringOption('Xdoclint:all,-missing', '-quiet')
 }
+
+task getVersion << {
+  println version
+}
