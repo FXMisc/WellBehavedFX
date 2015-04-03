@@ -5,9 +5,10 @@ jdk:
 os:
   - linux
 
-# OK to run in container which does not allow sudo
+# run in container
 sudo: false
 
+# use framebuffer for UI
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
