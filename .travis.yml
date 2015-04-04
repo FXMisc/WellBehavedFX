@@ -16,8 +16,7 @@ before_install:
 # add Sonatype credentials
 env:
   global:
-    - secure: "VERCkAdb227BvYQfU5i5VbEqsM8uK9MRumUqlY402Pz/eIUp5qenIE6BGKOOZvNnsEwbuTGDaS5OTQeFchWMsrv1Zv0k/2Klpxgy/UdOWXgwk3qWv9pAl5Xn0+cSKKS/X7V5j8wXUlBzFVIBTrjJ1KNwKgqguL5V8t1nJhLrH5o="
-    - secure: "er/TMvUHDBuZ8Mmj1/Z4NlpQiXoTUhL2aumt7y4qCCwQEV8lRrWXR79GVg2X6tlzTyUTUcurlvLwqvGceW+Vh60I52xTH8oFPsf1uPmJXv78qJ2ZRAzxjQkBO+OnKOVEU+69aKdRt/NymEtTUxVsTHi60tRVNzm0LYFcFYlO1JQ="
+    - secure: "MiZQYDryxMrzPesY0GOiIaqUSZrjP+bpjBpX9YTO+azWQ47O20C/jVQkHwgTOa6DCcrwssqgWYyXm5UAu7R4n0QcMX04oTqeHER6vwndo00jP6KEhd5LzHLx6AslA6dHTbVYQzwXldgYfIeLqGOPRXPB3mx8XAAIqz6x8wbf618="
 
 # publish artifacts after a successful build
 after_success:

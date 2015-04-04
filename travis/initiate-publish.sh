@@ -1,14 +1,12 @@
 #!/bin/bash
 
 if [ "$TRAVIS_REPO_SLUG" == "TomasMikula/WellBehavedFX" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
-  if [[ $(gradle -q getVersion) != *SNAPSHOT* ]]; then
-      echo 'Travis can only publish snapshots.'
-      exit 0
-  fi
+  openssl aes-256-cbc -k "$ENC_PWD" -in gradle.properties.enc -out gradle.properties
+  openssl aes-256-cbc -k "$ENC_PWD" -in secring.gpg.enc -out secring.gpg
 
   echo -e "Starting publish to Sonatype...\n"
 
-  gradle uploadArchives -PnexusUsername="${NEXUS_USERNAME}" -PnexusPassword="${NEXUS_PASSWORD}"
+  gradle uploadArchives
   RETVAL=$?
 
   if [ $RETVAL -eq 0 ]; then
