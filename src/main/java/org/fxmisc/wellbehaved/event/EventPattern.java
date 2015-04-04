@@ -40,8 +40,12 @@ public interface EventPattern<T extends Event, U extends T> {
         };
     }
 
+    static EventPattern<Event, KeyEvent> keyPressed() {
+        return eventTypePattern(KeyEvent.KEY_PRESSED);
+    }
+
     static EventPattern<Event, KeyEvent> keyPressed(KeyCombination combination) {
-        return eventTypePattern(KeyEvent.KEY_PRESSED).and(combination::match);
+        return keyPressed().and(combination::match);
     }
 
     static EventPattern<Event, KeyEvent> keyPressed(KeyCode code, KeyCombination.Modifier... modifiers) {
@@ -52,8 +56,12 @@ public interface EventPattern<T extends Event, U extends T> {
         return keyPressed(new KeyCharacterCombination(character, modifiers));
     }
 
+    static EventPattern<Event, KeyEvent> keyReleased() {
+        return eventTypePattern(KEY_RELEASED);
+    }
+
     static EventPattern<Event, KeyEvent> keyReleased(KeyCombination combination) {
-        return eventTypePattern(KEY_RELEASED).and(combination::match);
+        return keyReleased().and(combination::match);
     }
 
     static EventPattern<Event, KeyEvent> keyReleased(KeyCode code, KeyCombination.Modifier... modifiers) {
@@ -64,8 +72,12 @@ public interface EventPattern<T extends Event, U extends T> {
         return keyReleased(new KeyCharacterCombination(character, modifiers));
     }
 
+    static EventPattern<Event, KeyEvent> keyTyped() {
+        return eventTypePattern(KEY_TYPED);
+    }
+
     static EventPattern<Event, KeyEvent> keyTyped(String character, KeyCombination.Modifier... modifiers) {
         KeyTypedCombination combination = new KeyTypedCombination(character, modifiers);
-        return eventTypePattern(KEY_TYPED).and(combination::match);
+        return keyTyped().and(combination::match);
     }
 }
