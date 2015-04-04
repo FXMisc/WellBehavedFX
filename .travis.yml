@@ -27,10 +27,6 @@ after_success:
 
 before_deploy:
   - export VERSION=$(gradle -q getVersion)
-  - echo $VERSION
-  - echo "build/libs/wellbehavedfx-${VERSION}.jar"
-  - ls "build/libs/wellbehavedfx-${VERSION}.jar"
-  - pwd
 deploy:
   provider: releases
   api_key:
