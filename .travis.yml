@@ -17,7 +17,8 @@ before_install:
 env:
   global:
     - secure: "MiZQYDryxMrzPesY0GOiIaqUSZrjP+bpjBpX9YTO+azWQ47O20C/jVQkHwgTOa6DCcrwssqgWYyXm5UAu7R4n0QcMX04oTqeHER6vwndo00jP6KEhd5LzHLx6AslA6dHTbVYQzwXldgYfIeLqGOPRXPB3mx8XAAIqz6x8wbf618="
+    - secure: "Yvaete6qRW94kFkf3VkaEL+XcrO6gSJLdmJWBexkhR69cNHM+zXph/rEK/gAF4D0KrpGwFvNiaFwlvoEN4OeQZmjEy8r7F6oSVC2SOYKePV3e8MXK7foIX0KcD3x7z3+wQk8Xqi3EMny9KmF+IaqbB5wQzOt68ip4oRg6rSkVA8="
 
-# publish artifacts after a successful build
+# publish artifacts and Javadoc after a successful build
 after_success:
-  - travis/initiate-publish.sh
+  - travis/publish.sh
