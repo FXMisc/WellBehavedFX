@@ -1,7 +1,9 @@
 #!/bin/bash
 
 if [ "$TRAVIS_REPO_SLUG" == "TomasMikula/WellBehavedFX" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+  pwd
   openssl aes-256-cbc -k "$ENC_PWD" -in gradle.properties.enc -out gradle.properties
+  head -n 1 gradle.properties
   openssl aes-256-cbc -k "$ENC_PWD" -in secring.gpg.enc -out secring.gpg
 
   echo -e "Starting publish to Sonatype...\n"
