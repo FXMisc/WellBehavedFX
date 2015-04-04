@@ -24,6 +24,7 @@ if [ "$TRAVIS_REPO_SLUG" == "TomasMikula/WellBehavedFX" ] && [ "$TRAVIS_PULL_REQ
 
     git config --global user.email "travis@travis-ci.org"
     git config --global user.name "travis-ci"
+    git config --global push.default simple
     git clone --quiet https://${GH_TOKEN}@github.com/FXMisc/fxmisc.github.io fxmisc
 
     cd fxmisc
