@@ -2,6 +2,7 @@ package org.fxmisc.wellbehaved.event.experimental;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -90,6 +91,41 @@ public interface InputMap<E extends Event> {
         return consume(EventPattern.eventType(eventType));
     }
 
+    public static <T extends Event, U extends T> InputMap<U> consumeWhen(
+            EventPattern<? super T, ? extends U> eventPattern,
+            BooleanSupplier condition,
+            Consumer<? super U> action) {
+        return process(eventPattern, u -> {
+            if(condition.getAsBoolean()) {
+                action.accept(u);
+                return Result.CONSUME;
+            } else {
+                return Result.PROCEED;
+            }
+        });
+    }
+
+    public static <T extends Event> InputMap<T> consumeWhen(
+            EventType<? extends T> eventType,
+            BooleanSupplier condition,
+            Consumer<? super T> action) {
+        return consumeWhen(EventPattern.eventType(eventType), condition, action);
+    }
+
+    public static <T extends Event, U extends T> InputMap<U> consumeUnless(
+            EventPattern<? super T, ? extends U> eventPattern,
+            BooleanSupplier condition,
+            Consumer<? super U> action) {
+        return consumeWhen(eventPattern, () -> !condition.getAsBoolean(), action);
+    }
+
+    public static <T extends Event> InputMap<T> consumeUnless(
+            EventType<? extends T> eventType,
+            BooleanSupplier condition,
+            Consumer<? super T> action) {
+        return consumeUnless(EventPattern.eventType(eventType), condition, action);
+    }
+
     public static <T extends Event, U extends T> InputMap<U> ignore(
             EventPattern<? super T, ? extends U> eventPattern) {
         return new PatternActionMap<>(eventPattern, PatternActionMap.CONST_IGNORE);
@@ -98,6 +134,32 @@ public interface InputMap<E extends Event> {
     public static <T extends Event> InputMap<T> ignore(
             EventType<? extends T> eventType) {
         return ignore(EventPattern.eventType(eventType));
+    }
+
+    public static <T extends Event> InputMap<T> when(
+            BooleanSupplier condition, InputMap<T> im) {
+
+        return new InputMap<T>() {
+
+            @Override
+            public void forEachEventType(HandlerConsumer<? super T> f) {
+                HandlerConsumer<T> g = new HandlerConsumer<T>() {
+
+                    @Override
+                    public <F extends T> void accept(
+                            EventType<? extends F> t, InputHandler<? super F> h) {
+                        f.accept(t, evt -> condition.getAsBoolean() ? h.process(evt) : Result.PROCEED);
+                    }
+
+                };
+
+            }
+        };
+    }
+
+    public static <T extends Event> InputMap<T> unless(
+            BooleanSupplier condition, InputMap<T> im) {
+        return when(() -> !condition.getAsBoolean(), im);
     }
 }
 
