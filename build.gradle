@@ -27,6 +27,7 @@ targetCompatibility = '1.8'
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '[4.0,)'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-junit', version: '2.0.0.0'
 }
 
 javadoc {
