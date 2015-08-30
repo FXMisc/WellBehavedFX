@@ -76,29 +76,29 @@ Maven artifacts are deployed to Maven Central repository with the following Mave
 
 | Group ID               | Artifact ID    | Version |
 | :--------------------: | :------------: | :-----: |
-| org.fxmisc.wellbehaved | wellbehavedfx  | 0.1.1     |
+| org.fxmisc.wellbehaved | wellbehavedfx  | 0.2     |
 
 ### Gradle example
 
 ```groovy
 dependencies {
-    compile group: 'org.fxmisc.wellbehaved', name: 'wellbehavedfx', version: '0.1.1'
+    compile group: 'org.fxmisc.wellbehaved', name: 'wellbehavedfx', version: '0.2'
 }
 ```
 
 ### Sbt example
 
 ```scala
-libraryDependencies += "org.fxmisc.wellbehaved" % "wellbehavedfx" % "0.1.1"
+libraryDependencies += "org.fxmisc.wellbehaved" % "wellbehavedfx" % "0.2"
 ```
 
 ### Manual download
 
-[Download](https://oss.sonatype.org/content/groups/public/org/fxmisc/wellbehaved/wellbehavedfx/0.1.1/) the JAR file and place it on your classpath.
+[Download](https://oss.sonatype.org/content/groups/public/org/fxmisc/wellbehaved/wellbehavedfx/0.2/) the JAR file and place it on your classpath.
 
 
 Links
 -------
 
 License: [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)  
-API documentation: [Javadoc](http://www.fxmisc.org/wellbehaved/javadoc/0.1.1/overview-summary.html)  
+API documentation: [Javadoc](http://www.fxmisc.org/wellbehaved/javadoc/0.2/overview-summary.html)  
