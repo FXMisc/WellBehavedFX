@@ -4,11 +4,11 @@ import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
 import static javafx.scene.input.KeyEvent.*;
 import static org.fxmisc.wellbehaved.event.experimental.EventPattern.*;
-import static org.fxmisc.wellbehaved.event.experimental.InputMap.*;
 import static org.fxmisc.wellbehaved.event.experimental.template.InputMapTemplate.*;
 import static org.junit.Assert.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.embed.swing.JFXPanel;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.InputEvent;
@@ -29,7 +29,7 @@ public class InputMapTemplateTest {
         InputMapTemplate<Node, KeyEvent> imt1 = consume(keyPressed(A), (s, e) -> res.set("A"));
         InputMapTemplate<Node, KeyEvent> imt2 = consume(keyPressed(B), (s, e) -> res.set("B"));
         InputMapTemplate<Node, KeyEvent> imt = imt1.orElse(imt2);
-        InputMap<KeyEvent> ignA = ignore(keyPressed(A));
+        InputMap<KeyEvent> ignA = InputMap.ignore(keyPressed(A));
 
         Node node1 = new Region();
         Node node2 = new Region();
@@ -63,6 +63,7 @@ public class InputMapTemplateTest {
 
     @Test
     public void textAreaExample() {
+        new JFXPanel();
         TextArea area1 = new TextArea();
         TextArea area2 = new TextArea();
 
