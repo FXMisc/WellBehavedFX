@@ -1,5 +1,7 @@
 package org.fxmisc.wellbehaved.event.experimental.template;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
 import static javafx.scene.input.KeyEvent.*;
@@ -69,5 +71,54 @@ public class InputMapTemplateTest {
 
         InputMapTemplate.installFallback(INPUT_MAP_TEMPLATE, area1);
         InputMapTemplate.installFallback(INPUT_MAP_TEMPLATE, area2);
+    }
+
+    @Test
+    public void postProcessTest() {
+        IntegerProperty counter = new SimpleIntegerProperty(0);
+
+        InputMapTemplate<Node, KeyEvent> baseIMT = InputMapTemplate.sequence(
+                consume(keyPressed(UP)),
+                consume(keyPressed(DOWN)),
+                consume(keyPressed(LEFT)),
+                consume(keyPressed(RIGHT))
+        );
+        InputMapTemplate<Node, KeyEvent> imtPP = InputMapTemplate.ifConsumed(baseIMT, (n, e) -> {
+            counter.set(counter.get() + 1);
+        });
+
+        Node node = new Region();
+        InputMapTemplate.installFallback(imtPP, node);
+
+        KeyEvent a = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
+        KeyEvent up = new KeyEvent(KEY_PRESSED, "", "", UP, false, false, false, false);
+        KeyEvent down = new KeyEvent(KEY_PRESSED, "", "", DOWN, false, false, false, false);
+        KeyEvent b = new KeyEvent(KEY_PRESSED, "", "", B, false, false, false, false);
+        KeyEvent left = new KeyEvent(KEY_PRESSED, "", "", LEFT, false, false, false, false);
+        KeyEvent right = new KeyEvent(KEY_PRESSED, "", "", RIGHT, false, false, false, false);
+
+        InputMapTest.dispatch(a, node);
+        assertEquals(0, counter.get());
+        assertFalse(a.isConsumed());
+
+        InputMapTest.dispatch(up, node);
+        assertEquals(1, counter.get());
+        assertTrue(up.isConsumed());
+
+        InputMapTest.dispatch(down, node);
+        assertEquals(2, counter.get());
+        assertTrue(down.isConsumed());
+
+        InputMapTest.dispatch(b, node);
+        assertEquals(2, counter.get());
+        assertFalse(b.isConsumed());
+
+        InputMapTest.dispatch(left, node);
+        assertEquals(3, counter.get());
+        assertTrue(left.isConsumed());
+
+        InputMapTest.dispatch(right, node);
+        assertEquals(4, counter.get());
+        assertTrue(right.isConsumed());
     }
 }

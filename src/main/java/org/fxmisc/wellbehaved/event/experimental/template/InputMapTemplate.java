@@ -67,7 +67,7 @@ public abstract class InputMapTemplate<S, E extends Event> {
     }
 
     @SafeVarargs
-    static <S, E extends Event> InputMapTemplate<S, E> sequence(InputMapTemplate<S, ? extends E>... templates) {
+    public static <S, E extends Event> InputMapTemplate<S, E> sequence(InputMapTemplate<S, ? extends E>... templates) {
         return new TemplateChain<>(templates);
     }
 
@@ -81,6 +81,24 @@ public abstract class InputMapTemplate<S, E extends Event> {
             EventType<? extends T> eventType,
             BiFunction<? super S, ? super T, InputHandler.Result> action) {
         return process(EventPattern.eventType(eventType), action);
+    }
+
+    public InputMapTemplate<S, E> ifConsumed(BiConsumer<? super S, ? super E> postConsumption) {
+        InputMapTemplate<S, E> originalObj = this;
+        return new InputMapTemplate<S, E>() {
+            @Override
+            protected InputHandlerTemplateMap<S, E> getInputHandlerTemplateMap() {
+                return originalObj.getInputHandlerTemplateMap().map(iht -> {
+                    return (s, evt) -> {
+                        Result res = iht.process(s, evt);
+                        if (res == Result.CONSUME) {
+                            postConsumption.accept(s, evt);
+                        }
+                        return res;
+                    };
+                });
+            }
+        };
     }
 
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> consume(
