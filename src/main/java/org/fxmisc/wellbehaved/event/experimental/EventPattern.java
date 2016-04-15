@@ -59,24 +59,27 @@ public interface EventPattern<T extends Event, U extends T> {
         return onlyIf(condition.negate());
     }
 
-    static <T extends Event, U extends T, V extends U, W extends U> EventPattern<T, U> anyOf(
-            EventPattern<T, V> p1, EventPattern<T, W> p2) {
+    @SafeVarargs
+    static <T extends Event, U extends T> EventPattern<T, U> anyOf(EventPattern<T, ? extends U>... events) {
         return new EventPattern<T, U>() {
 
             @Override
             public Optional<? extends U> match(T event) {
-                Optional<? extends V> match1 = p1.match(event);
-                if(match1.isPresent()) {
-                    return match1;
-                } else {
-                    return p2.match(event);
+                for (EventPattern<T, ? extends U> evt : events) {
+                    Optional<? extends U> match = evt.match(event);
+                    if(match.isPresent()) {
+                        return match;
+                    }
                 }
+                return Optional.empty();
             }
 
             @Override
             public Set<EventType<? extends U>> getEventTypes() {
-                HashSet<EventType<? extends U>> ret = new HashSet<>(p1.getEventTypes());
-                ret.addAll(p2.getEventTypes());
+                HashSet<EventType<? extends U>> ret = new HashSet<>();
+                for (EventPattern<T, ? extends U> evt : events) {
+                    ret.addAll(evt.getEventTypes());
+                }
                 return ret;
             }
 
