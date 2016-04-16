@@ -67,7 +67,7 @@ public abstract class InputMapTemplate<S, E extends Event> {
     }
 
     @SafeVarargs
-    static <S, E extends Event> InputMapTemplate<S, E> sequence(InputMapTemplate<S, ? extends E>... templates) {
+    public static <S, E extends Event> InputMapTemplate<S, E> sequence(InputMapTemplate<S, ? extends E>... templates) {
         return new TemplateChain<>(templates);
     }
 
