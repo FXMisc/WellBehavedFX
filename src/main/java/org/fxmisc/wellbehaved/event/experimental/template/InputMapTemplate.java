@@ -84,11 +84,10 @@ public abstract class InputMapTemplate<S, E extends Event> {
     }
 
     public InputMapTemplate<S, E> ifConsumed(BiConsumer<? super S, ? super E> postConsumption) {
-        InputMapTemplate<S, E> originalObj = this;
         return new InputMapTemplate<S, E>() {
             @Override
             protected InputHandlerTemplateMap<S, E> getInputHandlerTemplateMap() {
-                return originalObj.getInputHandlerTemplateMap().map(iht -> {
+                return InputMapTemplate.this.getInputHandlerTemplateMap().map(iht -> {
                     return (s, evt) -> {
                         Result res = iht.process(s, evt);
                         if (res == Result.CONSUME) {
