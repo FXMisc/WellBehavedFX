@@ -74,7 +74,7 @@ public class InputMapTemplateTest {
     }
 
     @Test
-    public void postProcessTest() {
+    public void testIfConsumed() {
         IntegerProperty counter = new SimpleIntegerProperty(0);
 
         InputMapTemplate<Node, KeyEvent> baseIMT = InputMapTemplate.sequence(
@@ -83,9 +83,7 @@ public class InputMapTemplateTest {
                 consume(keyPressed(LEFT)),
                 consume(keyPressed(RIGHT))
         );
-        InputMapTemplate<Node, KeyEvent> imtPP = InputMapTemplate.ifConsumed(baseIMT, (n, e) -> {
-            counter.set(counter.get() + 1);
-        });
+        InputMapTemplate<Node, KeyEvent> imtPP = baseIMT.ifConsumed((n, e) -> counter.set(counter.get() + 1));
 
         Node node = new Region();
         InputMapTemplate.installFallback(imtPP, node);
