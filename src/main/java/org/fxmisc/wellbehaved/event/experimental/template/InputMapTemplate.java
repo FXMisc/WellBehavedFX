@@ -83,6 +83,23 @@ public abstract class InputMapTemplate<S, E extends Event> {
         return process(EventPattern.eventType(eventType), action);
     }
 
+    public InputMapTemplate<S, E> ifConsumed(BiConsumer<? super S, ? super E> postConsumption) {
+        return new InputMapTemplate<S, E>() {
+            @Override
+            protected InputHandlerTemplateMap<S, E> getInputHandlerTemplateMap() {
+                return InputMapTemplate.this.getInputHandlerTemplateMap().map(iht -> {
+                    return (s, evt) -> {
+                        Result res = iht.process(s, evt);
+                        if (res == Result.CONSUME) {
+                            postConsumption.accept(s, evt);
+                        }
+                        return res;
+                    };
+                });
+            }
+        };
+    }
+
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> consume(
             EventPattern<? super T, ? extends U> eventPattern,
             BiConsumer<? super S, ? super U> action) {
