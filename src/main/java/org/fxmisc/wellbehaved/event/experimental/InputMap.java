@@ -40,6 +40,26 @@ public interface InputMap<E extends Event> {
         return this.equals(that) ? empty() : this;
     }
 
+    /**
+     * Executes some additional handler if the event was consumed
+     */
+    default InputMap<E> ifConsumed(Consumer<? super E> postConsumption) {
+        return handlerConsumer -> InputMap.this.forEachEventType(new HandlerConsumer<E>() {
+
+            @Override
+            public <T extends E> void accept(EventType<? extends T> t, InputHandler<? super T> h) {
+                InputHandler<T> h2 = e -> {
+                    Result res = h.process(e);
+                    if(res == Result.CONSUME) {
+                        postConsumption.accept(e);
+                    }
+                    return res;
+                };
+                handlerConsumer.accept(t, h2);
+            }
+
+        });
+    }
 
     static <E extends Event> InputMap<E> upCast(InputMap<? extends E> inputMap) {
         // Unsafe cast is justified by this type-safe equivalent expression:
