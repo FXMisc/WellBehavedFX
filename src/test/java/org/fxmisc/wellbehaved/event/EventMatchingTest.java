@@ -5,6 +5,7 @@ import static javafx.scene.input.KeyCombination.*;
 import static javafx.scene.input.KeyEvent.*;
 import static org.fxmisc.wellbehaved.event.EventPattern.*;
 import static org.junit.Assert.*;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.embed.swing.JFXPanel;
@@ -14,6 +15,8 @@ import javafx.scene.input.KeyEvent;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.sun.javafx.util.Utils;
 
 public class EventMatchingTest {
 
@@ -56,8 +59,10 @@ public class EventMatchingTest {
         handler.handle(shiftA);
         assertEquals("Shift+A", res.get());
 
-        handler.handle(altA);
-        assertEquals("Alt+A", res.get());
+        if(!Utils.isMac()) { // https://bugs.openjdk.java.net/browse/JDK-8134723
+            handler.handle(altA);
+            assertEquals("Alt+A", res.get());
+        }
 
         handler.handle(ctrlA);
         assertEquals("Ctrl+A", res.get());
