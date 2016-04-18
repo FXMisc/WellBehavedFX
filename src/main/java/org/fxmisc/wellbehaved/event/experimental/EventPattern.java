@@ -191,4 +191,28 @@ public interface EventPattern<T extends Event, U extends T> {
     static EventPattern<Event, MouseEvent> mouseMoved() {
         return eventType(MOUSE_MOVED);
     }
+
+    static EventPattern<Event, MouseEvent> mouseDragged() {
+        return eventType(MOUSE_DRAGGED);
+    }
+
+    static EventPattern<Event, MouseEvent> dragDetected() {
+        return eventType(DRAG_DETECTED);
+    }
+
+    static EventPattern<Event, MouseEvent> mouseEntered() {
+        return eventType(MOUSE_ENTERED);
+    }
+
+    static EventPattern<Event, MouseEvent> mouseEnteredTarget() {
+        return eventType(MOUSE_ENTERED_TARGET);
+    }
+
+    static EventPattern<Event, MouseEvent> mouseExited() {
+        return eventType(MOUSE_EXITED);
+    }
+
+    static EventPattern<Event, MouseEvent> mouseExitedTarget() {
+        return eventType(MOUSE_EXITED_TARGET);
+    }
 }
