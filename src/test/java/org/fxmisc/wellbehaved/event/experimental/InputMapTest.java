@@ -7,8 +7,6 @@ import static org.fxmisc.wellbehaved.event.experimental.InputMap.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-import java.util.function.Consumer;
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,7 +19,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 
-import org.fxmisc.wellbehaved.event.experimental.InputHandler.Result;
 import org.fxmisc.wellbehaved.event.experimental.InputMap.HandlerConsumer;
 import org.junit.Test;
 
@@ -232,33 +229,8 @@ public class InputMapTest {
         assertTrue(open.isConsumed());
     }
 
-    /**
-     * Custom implementation of InputMap that, for each handler, executes some
-     * additional action if the handler consumed the event.
-     */
-    private static <E extends Event> InputMap<E> postProcess(
-            InputMap<E> im, Consumer<? super E> postConsumption) {
-
-        return handlerConsumer -> im.forEachEventType(new HandlerConsumer<E>() {
-
-            @Override
-            public <T extends E> void accept(
-                    EventType<? extends T> t, InputHandler<? super T> h) {
-                InputHandler<T> h2 = e -> {
-                    Result res = h.process(e);
-                    if(res == Result.CONSUME) {
-                        postConsumption.accept(e);
-                    }
-                    return res;
-                };
-                handlerConsumer.accept(t, h2);
-            }
-
-        });
-    }
-
     @Test
-    public void postProcessExtensionTest() {
+    public void ifConsumedTest() {
         StringProperty res = new SimpleStringProperty();
         IntegerProperty counter = new SimpleIntegerProperty(0);
 
@@ -266,8 +238,8 @@ public class InputMapTest {
                 consume(keyPressed(UP),    e -> res.set("Up")),
                 consume(keyPressed(DOWN),  e -> res.set("Down")),
                 consume(keyPressed(LEFT),  e -> res.set("Left")),
-                consume(keyPressed(RIGHT), e -> res.set("Right")));
-        im = postProcess(im, e -> counter.set(counter.get() + 1));
+                consume(keyPressed(RIGHT), e -> res.set("Right")))
+                .ifConsumed(e -> counter.set(counter.get() + 1));
 
         KeyEvent a = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
         KeyEvent up = new KeyEvent(KEY_PRESSED, "", "", UP, false, false, false, false);
