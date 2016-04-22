@@ -8,7 +8,9 @@ import static org.fxmisc.wellbehaved.event.InputMap.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -173,6 +175,22 @@ public class InputMapTest {
         dispatch(event, im);
         assertEquals("4", res.get());
         assertFalse(event.isConsumed());
+    }
+
+    @Test
+    public void whenTest() {
+        BooleanProperty condition = new SimpleBooleanProperty(false);
+
+        InputMap<KeyEvent> im = when(condition::get, consume(keyPressed()));
+
+        KeyEvent event = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
+
+        dispatch(event, im);
+        assertFalse(event.isConsumed());
+
+        condition.set(true);
+        dispatch(event, im);
+        assertTrue(event.isConsumed());
     }
 
     @Test

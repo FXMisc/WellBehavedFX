@@ -173,6 +173,7 @@ public interface InputMap<E extends Event> {
 
                 };
 
+                im.forEachEventType(g);
             }
         };
     }
