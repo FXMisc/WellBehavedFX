@@ -15,8 +15,8 @@ import java.util.stream.Stream;
  * Prefix tree (Trie) with an additional property that no data is stored in
  * internal nodes.
  *
- * @param <K>
- * @param <V>
+ * @param <K> type of "strings" used to index values
+ * @param <V> type of values (data) indexed by this trie
  */
 public abstract class PrefixTree<K, V> {
 
