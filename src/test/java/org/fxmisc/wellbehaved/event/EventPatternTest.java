@@ -6,14 +6,21 @@ import static javafx.scene.input.KeyEvent.*;
 import static org.fxmisc.wellbehaved.event.EventPattern.*;
 import static org.junit.Assert.*;
 
+import javafx.embed.swing.JFXPanel;
 import javafx.event.Event;
 import javafx.scene.input.KeyEvent;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sun.javafx.util.Utils;
 
 public class EventPatternTest {
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        new JFXPanel(); // initialize JavaFX
+    }
 
     @Test
     public void simpleKeyMatchTest() {

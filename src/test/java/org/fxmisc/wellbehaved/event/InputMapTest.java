@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.embed.swing.JFXPanel;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.Node;
@@ -23,9 +24,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 
 import org.fxmisc.wellbehaved.event.InputMap.HandlerConsumer;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class InputMapTest {
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        new JFXPanel(); // initialize JavaFX
+    }
 
     @SuppressWarnings("serial")
     private static class FooEvent extends Event {

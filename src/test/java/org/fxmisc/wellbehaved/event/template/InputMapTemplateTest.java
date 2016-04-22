@@ -21,9 +21,15 @@ import javafx.scene.layout.Region;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.InputMapTest;
 import org.fxmisc.wellbehaved.event.Nodes;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class InputMapTemplateTest {
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        new JFXPanel(); // initialize JavaFX
+    }
 
     @Test
     public void test() {
@@ -66,7 +72,6 @@ public class InputMapTemplateTest {
 
     @Test
     public void textAreaExample() {
-        new JFXPanel();
         TextArea area1 = new TextArea();
         TextArea area2 = new TextArea();
 
