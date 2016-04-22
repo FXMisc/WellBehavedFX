@@ -14,7 +14,12 @@ import javafx.scene.control.SkinBase;
  * Provides factory methods to wire a {@link Visual} and a {@link Behavior} to
  * form a {@link Skin}. The factory methods are meant to be used to implement
  * the {@link Control#createDefaultSkin()} method.
+ *
+ * @deprecated Since 0.3. We have come to believe that skins, as designed in
+ * JavaFX, are not very useful and not worth the trouble. Package
+ * {@link org.fxmisc.wellbehaved.skin} will be removed in a future version.
  */
+@Deprecated
 public final class Skins {
 
     /**

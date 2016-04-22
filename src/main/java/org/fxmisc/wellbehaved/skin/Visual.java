@@ -13,7 +13,12 @@ import javafx.scene.control.Control;
  * implement {@link SimpleVisualBase}, or extend from {@link ComplexVisualBase}.
  *
  * @param <C> type of the control this Visual is used for.
+ *
+ * @deprecated Since 0.3. We have come to believe that skins, as designed in
+ * JavaFX, are not very useful and not worth the trouble. Package
+ * {@link org.fxmisc.wellbehaved.skin} will be removed in a future version.
  */
+@Deprecated
 public interface Visual<C extends Control> {
     /**
      * Returns the control this Visual is used for.

@@ -11,4 +11,5 @@
  * <p>Once you have the implementation of the Visual and the Behavior, you use
  * one of the factory methods from {@link Skins} to create a Skin instance.
  */
+@Deprecated
 package org.fxmisc.wellbehaved.skin;

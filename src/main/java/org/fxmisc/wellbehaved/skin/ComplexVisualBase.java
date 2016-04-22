@@ -11,7 +11,12 @@ import javafx.scene.control.Control;
  * An implementation of this class is responsible for attaching any nodes to
  * control's child list as well as removing them on {@link #dispose()}.
  * @param <C> type of the control.
+ *
+ * @deprecated Since 0.3. We have come to believe that skins, as designed in
+ * JavaFX, are not very useful and not worth the trouble. Package
+ * {@link org.fxmisc.wellbehaved.skin} will be removed in a future version.
  */
+@Deprecated
 public abstract class ComplexVisualBase<C extends Control> extends VisualBase<C> {
     private final ObservableList<Node> children;
 
