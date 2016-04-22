@@ -101,4 +101,4 @@ Links
 -------
 
 License: [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)  
-API documentation: [Javadoc](http://www.fxmisc.org/wellbehaved/javadoc/0.2.1/overview-summary.html)  
+API documentation: [Javadoc](http://fxmisc.github.io/wellbehaved/javadoc/0.2.1/overview-summary.html)  
