@@ -1,13 +1,14 @@
-package org.fxmisc.wellbehaved.event.experimental.template;
+package org.fxmisc.wellbehaved.event.template;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
 import static javafx.scene.input.KeyEvent.*;
-import static org.fxmisc.wellbehaved.event.experimental.EventPattern.*;
-import static org.fxmisc.wellbehaved.event.experimental.template.InputMapTemplate.*;
+import static org.fxmisc.wellbehaved.event.EventPattern.*;
+import static org.fxmisc.wellbehaved.event.template.InputMapTemplate.*;
 import static org.junit.Assert.*;
+
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.embed.swing.JFXPanel;
@@ -17,9 +18,9 @@ import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 
-import org.fxmisc.wellbehaved.event.experimental.InputMap;
-import org.fxmisc.wellbehaved.event.experimental.InputMapTest;
-import org.fxmisc.wellbehaved.event.experimental.Nodes;
+import org.fxmisc.wellbehaved.event.InputMap;
+import org.fxmisc.wellbehaved.event.InputMapTest;
+import org.fxmisc.wellbehaved.event.Nodes;
 import org.junit.Test;
 
 public class InputMapTemplateTest {

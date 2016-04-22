@@ -1,5 +1,7 @@
 package org.fxmisc.wellbehaved.event;
 
+import java.util.function.Predicate;
+
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
@@ -8,17 +10,21 @@ import javafx.scene.input.KeyEvent;
  * from KeyCombination.
  */
 class KeyTypedCombination extends KeyCombination {
-    private final String character;
+    private final Predicate<String> charTest;
+
+    KeyTypedCombination(Predicate<String> charTest, Modifier... modifiers) {
+        super(modifiers);
+        this.charTest = charTest;
+    }
 
     KeyTypedCombination(String character, Modifier... modifiers) {
-        super(modifiers);
-        this.character = character;
+        this(character::equals);
     }
 
     @Override
     public boolean match(KeyEvent event) {
         return super.match(event) // matches the modifiers
                 && event.getEventType() == KeyEvent.KEY_TYPED
-                && event.getCharacter().equals(character);
+                && charTest.test(event.getCharacter());
     }
 }

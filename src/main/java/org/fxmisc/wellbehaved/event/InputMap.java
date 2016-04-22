@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.event.experimental;
+package org.fxmisc.wellbehaved.event;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import javafx.event.Event;
 import javafx.event.EventType;
 
-import org.fxmisc.wellbehaved.event.experimental.InputHandler.Result;
+import org.fxmisc.wellbehaved.event.InputHandler.Result;
 
 /**
  *

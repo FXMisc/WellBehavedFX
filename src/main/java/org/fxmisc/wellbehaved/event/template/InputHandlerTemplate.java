@@ -1,8 +1,8 @@
-package org.fxmisc.wellbehaved.event.experimental.template;
+package org.fxmisc.wellbehaved.event.template;
 
 import javafx.event.Event;
 
-import org.fxmisc.wellbehaved.event.experimental.InputHandler.Result;
+import org.fxmisc.wellbehaved.event.InputHandler.Result;
 
 @FunctionalInterface
 public interface InputHandlerTemplate<S, E extends Event> {

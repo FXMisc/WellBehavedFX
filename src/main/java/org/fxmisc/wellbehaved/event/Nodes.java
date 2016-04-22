@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.event.experimental;
+package org.fxmisc.wellbehaved.event;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
 
-import org.fxmisc.wellbehaved.event.experimental.InputMap.HandlerConsumer;
+import org.fxmisc.wellbehaved.event.InputMap.HandlerConsumer;
 
 public class Nodes {
 

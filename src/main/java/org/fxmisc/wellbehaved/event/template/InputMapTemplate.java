@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.event.experimental.template;
+package org.fxmisc.wellbehaved.event.template;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -11,11 +11,11 @@ import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.Node;
 
-import org.fxmisc.wellbehaved.event.experimental.EventPattern;
-import org.fxmisc.wellbehaved.event.experimental.InputHandler;
-import org.fxmisc.wellbehaved.event.experimental.InputHandler.Result;
-import org.fxmisc.wellbehaved.event.experimental.InputMap;
-import org.fxmisc.wellbehaved.event.experimental.Nodes;
+import org.fxmisc.wellbehaved.event.EventPattern;
+import org.fxmisc.wellbehaved.event.InputHandler;
+import org.fxmisc.wellbehaved.event.InputHandler.Result;
+import org.fxmisc.wellbehaved.event.InputMap;
+import org.fxmisc.wellbehaved.event.Nodes;
 
 public abstract class InputMapTemplate<S, E extends Event> {
 

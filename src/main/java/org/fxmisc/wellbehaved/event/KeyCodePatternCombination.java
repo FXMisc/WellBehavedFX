@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.event.experimental;
+package org.fxmisc.wellbehaved.event;
 
 import java.util.function.Predicate;
 

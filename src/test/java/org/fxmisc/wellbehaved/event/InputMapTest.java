@@ -1,9 +1,10 @@
-package org.fxmisc.wellbehaved.event.experimental;
+package org.fxmisc.wellbehaved.event;
 
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyEvent.*;
-import static org.fxmisc.wellbehaved.event.experimental.EventPattern.*;
-import static org.fxmisc.wellbehaved.event.experimental.InputMap.*;
+import static org.fxmisc.wellbehaved.event.EventPattern.*;
+import static org.fxmisc.wellbehaved.event.InputHandler.Result.*;
+import static org.fxmisc.wellbehaved.event.InputMap.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -19,7 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 
-import org.fxmisc.wellbehaved.event.experimental.InputMap.HandlerConsumer;
+import org.fxmisc.wellbehaved.event.InputMap.HandlerConsumer;
 import org.junit.Test;
 
 public class InputMapTest {
@@ -145,6 +146,33 @@ public class InputMapTest {
         dispatch(bPressed, node);
         assertEquals("consumed", res.get());
         assertTrue(bPressed.isConsumed());
+    }
+
+    @Test
+    public void withoutTest() {
+        StringProperty res = new SimpleStringProperty();
+
+        InputMap<KeyEvent> im1 = consume(keyPressed(B), e -> { res.set("1"); });
+        InputMap<KeyEvent> im2 = consume(keyPressed(A), e -> { res.set("2"); });
+        InputMap<KeyEvent> im3 = consume(keyPressed(A), e -> { res.set("3"); });
+        InputMap<KeyEvent> im4 = process(keyPressed(A), e -> { res.set("4"); return PROCEED; });
+
+        KeyEvent event = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
+
+        InputMap<? super KeyEvent> im = sequence(im1, im2, im3, im4);
+        dispatch(event, im);
+        assertEquals("2", res.get());
+
+        im = im.without(im2);
+        event = event.copyFor(null, null); // obtain unconsumed event
+        dispatch(event, im);
+        assertEquals("3", res.get());
+
+        im = im.without(im3);
+        event = event.copyFor(null, null); // obtain unconsumed event
+        dispatch(event, im);
+        assertEquals("4", res.get());
+        assertFalse(event.isConsumed());
     }
 
     @Test

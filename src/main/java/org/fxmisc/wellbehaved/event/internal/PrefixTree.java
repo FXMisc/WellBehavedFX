@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.event.experimental.internal;
+package org.fxmisc.wellbehaved.event.internal;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;

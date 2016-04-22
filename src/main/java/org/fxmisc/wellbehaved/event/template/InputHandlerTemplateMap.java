@@ -1,4 +1,4 @@
-package org.fxmisc.wellbehaved.event.experimental.template;
+package org.fxmisc.wellbehaved.event.template;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,10 +10,10 @@ import java.util.function.Function;
 import javafx.event.Event;
 import javafx.event.EventType;
 
-import org.fxmisc.wellbehaved.event.experimental.InputHandler.Result;
-import org.fxmisc.wellbehaved.event.experimental.internal.PrefixTree;
-import org.fxmisc.wellbehaved.event.experimental.internal.PrefixTree.Ops;
-import org.fxmisc.wellbehaved.event.experimental.template.InputMapTemplate.HandlerTemplateConsumer;
+import org.fxmisc.wellbehaved.event.InputHandler.Result;
+import org.fxmisc.wellbehaved.event.internal.PrefixTree;
+import org.fxmisc.wellbehaved.event.internal.PrefixTree.Ops;
+import org.fxmisc.wellbehaved.event.template.InputMapTemplate.HandlerTemplateConsumer;
 
 class InputHandlerTemplateMap<S, E extends Event> {
 
