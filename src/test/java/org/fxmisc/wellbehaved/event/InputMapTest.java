@@ -325,4 +325,90 @@ public class InputMapTest {
         assertEquals(4, counter.get());
         assertTrue(right.isConsumed());
     }
+
+    @Test
+    public void ifIgnoredTest() {
+        IntegerProperty counter = new SimpleIntegerProperty(0);
+
+        InputMap<KeyEvent> im = InputMap.sequence(
+                ignore(keyPressed(UP)),
+                ignore(keyPressed(DOWN)),
+                ignore(keyPressed(RIGHT)),
+                ignore(keyPressed(LEFT))
+        ).ifIgnored(e -> counter.set(counter.get() + 1));
+
+        KeyEvent a = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
+        KeyEvent up = new KeyEvent(KEY_PRESSED, "", "", UP, false, false, false, false);
+        KeyEvent down = new KeyEvent(KEY_PRESSED, "", "", DOWN, false, false, false, false);
+        KeyEvent left = new KeyEvent(KEY_PRESSED, "", "", LEFT, false, false, false, false);
+        KeyEvent right = new KeyEvent(KEY_PRESSED, "", "", RIGHT, false, false, false, false);
+
+        dispatch(a, im);
+        assertEquals(0, counter.get());
+        assertFalse(a.isConsumed());
+
+        dispatch(up, im);
+        assertEquals(1, counter.get());
+        assertFalse(up.isConsumed());
+
+        dispatch(down, im);
+        assertEquals(2, counter.get());
+        assertFalse(down.isConsumed());
+
+        dispatch(left, im);
+        assertEquals(3, counter.get());
+        assertFalse(left.isConsumed());
+
+        dispatch(right, im);
+        assertEquals(4, counter.get());
+        assertFalse(right.isConsumed());
+    }
+
+    @Test
+    public void ifProceededTest() {
+        StringProperty res = new SimpleStringProperty();
+        IntegerProperty counter = new SimpleIntegerProperty(0);
+
+        InputHandler.Result returnVal = InputHandler.Result.PROCEED;
+
+        InputMap<KeyEvent> im = InputMap.sequence(
+                consume(keyPressed(A)),
+
+                process(keyPressed(UP),    e -> { res.set("Up");    return returnVal; }),
+                process(keyPressed(DOWN),  e -> { res.set("Down");  return returnVal; }),
+                process(keyPressed(LEFT),  e -> { res.set("Left");  return returnVal; }),
+                process(keyPressed(RIGHT), e -> { res.set("Right"); return returnVal; })
+        ).ifProcessed(e -> counter.set(counter.get() + 1));
+
+        KeyEvent a = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
+        KeyEvent up = new KeyEvent(KEY_PRESSED, "", "", UP, false, false, false, false);
+        KeyEvent down = new KeyEvent(KEY_PRESSED, "", "", DOWN, false, false, false, false);
+        KeyEvent left = new KeyEvent(KEY_PRESSED, "", "", LEFT, false, false, false, false);
+        KeyEvent right = new KeyEvent(KEY_PRESSED, "", "", RIGHT, false, false, false, false);
+
+        dispatch(a, im);
+        assertNull(res.get());
+        assertEquals(0, counter.get());
+        assertTrue(a.isConsumed());
+
+        dispatch(up, im);
+        assertEquals("Up", res.get());
+        assertEquals(1, counter.get());
+        assertFalse(up.isConsumed());
+
+        dispatch(down, im);
+        assertEquals("Down", res.get());
+        assertEquals(2, counter.get());
+        assertFalse(down.isConsumed());
+
+        dispatch(left, im);
+        assertEquals("Left", res.get());
+        assertEquals(3, counter.get());
+        assertFalse(left.isConsumed());
+
+        dispatch(right, im);
+        assertEquals("Right", res.get());
+        assertEquals(4, counter.get());
+        assertFalse(right.isConsumed());
+    }
 }
