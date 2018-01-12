@@ -40,8 +40,10 @@ javadoc {
     ]
 }
 
-task getVersion << {
-  println version
+task getVersion {
+    doLast {
+        println version
+    }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
