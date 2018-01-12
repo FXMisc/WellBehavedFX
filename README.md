@@ -177,16 +177,6 @@ InputMapTemplate.installFallback(INPUT_MAP_TEMPLATE, area2);
 
 Notice that `INPUT_MAP_TEMPLATE` is `static` and then added to two `TextArea`s.
 
-
-Skin Scaffolding
-----------------
-
-Package `org.fxmisc.wellbehaved.skin` helps with implementing skins for JavaFX controls according to the MVC pattern. Have a look at [this blog post](http://tomasmikula.github.io/blog/2014/06/11/separation-of-view-and-controller-in-javafx-controls.html) for the general idea.
-
-However, over time, we have come to believe that the skin architecture in JavaFX is not very useful and complicates the things more than it helps, at least for non-trivial UI controls (see for example [this discussion](http://mail.openjdk.java.net/pipermail/openjfx-dev/2015-March/016827.html)).  
-**This part of the library will therefore be removed in a future version**.
-
-
 Download
 --------
 
