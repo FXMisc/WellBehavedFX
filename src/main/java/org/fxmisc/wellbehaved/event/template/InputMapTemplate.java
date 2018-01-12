@@ -30,22 +30,47 @@ import org.fxmisc.wellbehaved.event.Nodes;
  * <pre><code>
  * public class CustomTextField extends TextField {
  *
- *     private final static InputMapTemplate&lt;Event&gt; BEHAVIOR;
+ *     private final static InputMapTemplate&lt;? super Event&gt; BEHAVIOR;
  *
  *     static {
- *         // InputMapTemplate creation code
- *         BEHAVIOR = sequence(
+ *
+ *          // creating InputMapTemplates by
+ *          InputMapTemplate&lt;CustomTextField, ? extends KeyEvent&gt; keyEventBehavior = sequence(
+ *              consume(keyTyped(), (field, event) -&gt; field.setText(event.getText()),
+ *              consume(
+ *                  anyOf(
+ *                      mousePressed(),
+ *                      mouseMoved(),
+ *                      mouseReleased()
+ *                  ),
+ *                  (field, event) -&gt; field.setText("Mouse event detected! Event: " + event)
+ *              )
+ *          );
+ *
+ *          // Other InputMapTemplates (though these don't need to be broken up by
+ *          // KeyEvent, MouseEvent, etc. They could be interwoven depending on your desired behavior)
+ *          InputMapTemplate&lt;CustomTextField, ? extends MouseEvent&gt; mouseEventBehavior = sequence(
+ *              // other InputMapTemplates go here...
+ *          );
+ *
+ *          InputMapTemplate&lt;CustomTextField, ? extends Event&gt; otherCustomEventBehavior = sequence(
+ *              // other InputMapTemplates go here...
+ *          );
+ *
+ *          // Tying all of them together into one final InputMapTemplate
+ *          BEHAVIOR = sequence(
  *              keyEventBehavior,
  *              mouseEventBehavior,
  *              otherCustomEventBehavior
- *         );
+ *          );
  *     }
  *
  *     public CustomTextField(Object[] args) {
  *         super(args);
  *         // other constructor stuff here
  *
- *         // Install InputMapTemplate onto this node here
+ *         // Install InputMapTemplate onto this node here via one of the two "install" methods
+ *         // described after this code block
  *     }
  *
  *     // rest of the class

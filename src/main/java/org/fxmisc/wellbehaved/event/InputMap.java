@@ -104,7 +104,7 @@ import org.fxmisc.wellbehaved.event.InputHandler.Result;
  * InputMap&lt;CustomEvent&gt; someCustomEventInputMap = // imagine I put something here...
  *
  * // notice the very generic "Event" event type
- * InputMap&lt;Event&gt; allBehaviorForCustomTextField = sequence(
+ * InputMap&lt;? super Event&gt; allBehaviorForCustomTextField = sequence(
  *      // when an event occurs, check whether the below input map's EventPattern matches the given event
  *      typeTheLetter,
  *      // only pattern match against the below input map if the previous one didn't match
