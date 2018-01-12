@@ -30,7 +30,7 @@ import org.fxmisc.wellbehaved.event.Nodes;
  * <pre><code>
  * public class CustomTextField extends TextField {
  *
- *     private final static InputMapTemplate&lt;Event&gt; BEHAVIOR;
+ *     private final static InputMapTemplate&lt;? super Event&gt; BEHAVIOR;
  *
  *     static {
  *         // InputMapTemplate creation code
