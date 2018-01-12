@@ -5,3 +5,5 @@ gradle.properties
 .classpath
 .settings/
 /bin/
+*.iml
+.idea/
