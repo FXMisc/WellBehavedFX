@@ -17,6 +17,48 @@ import org.fxmisc.wellbehaved.event.InputHandler.Result;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
 
+/**
+ * See {@link InputMap} for an explanation. This simply turns that concept into a template that can be used
+ * to add the same {@link InputMap} to multiple instances of the same class.
+ *
+ * <h2>Adding a template to a class</h2>
+ *
+ * <p>
+ *     Given a class, the InputMapTemplate code should be created in a {@code static} block and then instantiate
+ *     itself in the node's constructor:
+ * </p>
+ * <pre><code>
+ * public class CustomTextField extends TextField {
+ *
+ *     private final static InputMapTemplate&lt;Event&gt; BEHAVIOR;
+ *
+ *     static {
+ *         // InputMapTemplate creation code
+ *         BEHAVIOR = sequence(
+ *              keyEventBehavior,
+ *              mouseEventBehavior,
+ *              otherCustomEventBehavior
+ *         );
+ *     }
+ *
+ *     public CustomTextField(Object[] args) {
+ *         super(args);
+ *         // other constructor stuff here
+ *
+ *         // Install InputMapTemplate onto this node here
+ *     }
+ *
+ *     // rest of the class
+ * }
+ * </code></pre>
+ * <p>
+ *     The InputMapTemplate can be instantiated as a default behavior ({@link #installFallback(InputMapTemplate, Node)}
+ *     or as something that overrides prior default behavior ({@link #installOverride(InputMapTemplate, Node)} (or
+ *     their variants). Likewise, it can be removed via {@link #uninstall(InputMapTemplate, Node)}.
+ * </p>
+ * @param <S> the type of the object that will be passed into the {@link InputHandlerTemplate}'s block of code.
+ * @param <E> the event type for which this InputMap's {@link EventPattern} matches
+ */
 public abstract class InputMapTemplate<S, E extends Event> {
 
     @FunctionalInterface
@@ -49,10 +91,16 @@ public abstract class InputMapTemplate<S, E extends Event> {
         inputHandlerTemplates.forEach(f);
     }
 
+    /**
+     * Shorthand for {@link #sequence(InputMapTemplate[])}  sequence(this, that)}
+     */
     public final InputMapTemplate<S, E> orElse(InputMapTemplate<S, ? extends E> that) {
         return sequence(this, that);
     }
 
+    /**
+     * Converts this InputMapTemplate into an {@link InputMap} for the given {@code target}
+     */
     public final InputMap<E> instantiate(S target) {
         return new InputMapTemplateInstance<>(this, target);
     }
@@ -66,23 +114,40 @@ public abstract class InputMapTemplate<S, E extends Event> {
         return res;
     }
 
+    /**
+     * Creates a single InputMapTemplate that pattern matches a given event type against all the given
+     * InputMapTemplates. This is often the InputMapTemplate installed on a given node since it contains all
+     * the other InputMapTemplates.
+     */
     @SafeVarargs
     public static <S, E extends Event> InputMapTemplate<S, E> sequence(InputMapTemplate<S, ? extends E>... templates) {
         return new TemplateChain<>(templates);
     }
 
+    /**
+     * If the given {@link EventPattern} matches the given event type, runs the given action, and then attempts
+     * to pattern match the event type with the next {@code InputMap} (if one exists).
+     */
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> process(
             EventPattern<? super T, ? extends U> eventPattern,
             BiFunction<? super S, ? super U, InputHandler.Result> action) {
         return new PatternActionTemplate<>(eventPattern, action);
     }
 
+    /**
+     * When the given event type occurs, runs the given action, and then attempts
+     * to pattern match the event type with the next {@code InputMap} (if one exists).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> process(
             EventType<? extends T> eventType,
             BiFunction<? super S, ? super T, InputHandler.Result> action) {
         return process(EventPattern.eventType(eventType), action);
     }
 
+    /**
+     * Executes some additional handler if the event was consumed (e.g. {@link InputHandler#process(Event)} returns
+     * {@link Result#CONSUME}).
+     */
     public InputMapTemplate<S, E> ifConsumed(BiConsumer<? super S, ? super E> postConsumption) {
         return new InputMapTemplate<S, E>() {
             @Override
@@ -100,6 +165,10 @@ public abstract class InputMapTemplate<S, E extends Event> {
         };
     }
 
+    /**
+     * If the given {@link EventPattern} matches the given event type, runs the given action, consumes the event,
+     * and does not attempt to match additional {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> consume(
             EventPattern<? super T, ? extends U> eventPattern,
             BiConsumer<? super S, ? super U> action) {
@@ -109,22 +178,40 @@ public abstract class InputMapTemplate<S, E extends Event> {
         });
     }
 
+    /**
+     * When the given event type occurs, runs the given action, consumes the event,
+     * and does not attempt to match additional {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> consume(
             EventType<? extends T> eventType,
             BiConsumer<? super S, ? super T> action) {
         return consume(EventPattern.eventType(eventType), action);
     }
 
+    /**
+     * If the given {@link EventPattern} matches the given event type,
+     * consumes the event and does not attempt to match additional
+     * {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> consume(
             EventPattern<? super T, ? extends U> eventPattern) {
         return process(eventPattern, (s, u) -> Result.CONSUME);
     }
 
+    /**
+     * When the given event type occurs, consumes the event and does not attempt
+     * to match additional {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> consume(
             EventType<? extends T> eventType) {
         return consume(EventPattern.eventType(eventType));
     }
 
+    /**
+     * If the given {@link EventPattern} matches the given event type and {@code condition} is true,
+     * consumes the event and does not attempt to match additional
+     * {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> consumeWhen(
             EventPattern<? super T, ? extends U> eventPattern,
             Predicate<? super S> condition,
@@ -139,6 +226,11 @@ public abstract class InputMapTemplate<S, E extends Event> {
         });
     }
 
+    /**
+     * When the given event type occurs and {@code condition} is true,
+     * consumes the event and does not attempt to match additional
+     * {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> consumeWhen(
             EventType<? extends T> eventType,
             Predicate<? super S> condition,
@@ -146,6 +238,12 @@ public abstract class InputMapTemplate<S, E extends Event> {
         return consumeWhen(EventPattern.eventType(eventType), condition, action);
     }
 
+    /**
+     * If the given {@link EventPattern} matches the given event type and {@code condition} is false,
+     * consumes the event and does not attempt to match additional
+     * {@code InputMap}s (if they exist). If {@code condition} is true, continues to try to pattern match
+     * the event type with the next {@code InputMap} (if one exists).
+     */
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> consumeUnless(
             EventPattern<? super T, ? extends U> eventPattern,
             Predicate<? super S> condition,
@@ -153,6 +251,12 @@ public abstract class InputMapTemplate<S, E extends Event> {
         return consumeWhen(eventPattern, condition.negate(), action);
     }
 
+    /**
+     * When the given event type occurs and {@code condition} is false,
+     * consumes the event and does not attempt to match additional
+     * {@code InputMap}s (if they exist). If {@code condition} is true, continues to try to pattern match
+     * the event type with the next {@code InputMap} (if one exists).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> consumeUnless(
             EventType<? extends T> eventType,
             Predicate<? super S> condition,
@@ -160,16 +264,28 @@ public abstract class InputMapTemplate<S, E extends Event> {
         return consumeUnless(EventPattern.eventType(eventType), condition, action);
     }
 
+    /**
+     * If the given {@link EventPattern} matches the given event type, does nothing and does not attempt
+     * to match additional {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event, U extends T> InputMapTemplate<S, U> ignore(
             EventPattern<? super T, ? extends U> eventPattern) {
         return new PatternActionTemplate<>(eventPattern, PatternActionTemplate.CONST_IGNORE);
     }
 
+    /**
+     * When the given event type occurs, does nothing and does not attempt to match additional
+     * {@code InputMap}s (if they exist).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> ignore(
             EventType<? extends T> eventType) {
         return ignore(EventPattern.eventType(eventType));
     }
 
+    /**
+     * When the given {@code condition} is true, pattern matches the event with the given {@link InputMap} or
+     * proceeds to the next {@code InputMap} (if it exists).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> when(
             Predicate<? super S> condition, InputMapTemplate<S, T> imt) {
 
@@ -182,6 +298,10 @@ public abstract class InputMapTemplate<S, E extends Event> {
         };
     }
 
+    /**
+     * When the given {@code condition} is false, pattern matches the event with the given {@link InputMap} or
+     * proceeds to the next {@code InputMap} (if it exists).
+     */
     public static <S, T extends Event> InputMapTemplate<S, T> unless(
             Predicate<? super S> condition, InputMapTemplate<S, T> imt) {
         return when(condition.negate(), imt);
@@ -200,26 +320,44 @@ public abstract class InputMapTemplate<S, E extends Event> {
         };
     }
 
+    /**
+     * Instantiates the input map and installs it into the node via {@link Nodes#addInputMap(Node, InputMap)}
+     */
     public static <S extends Node, E extends Event> void installOverride(InputMapTemplate<S, E> imt, S node) {
         Nodes.addInputMap(node, imt.instantiate(node));
     }
 
+    /**
+     * Instantiates the input map and installs it into the node via {@link Nodes#addInputMap(Node, InputMap)}
+     */
     public static <S, N extends Node, E extends Event> void installOverride(InputMapTemplate<S, E> imt, S target, Function<? super S, ? extends N> getNode) {
         Nodes.addInputMap(getNode.apply(target), imt.instantiate(target));
     }
 
+    /**
+     * Instantiates the input map and installs it into the node via {@link Nodes#addFallbackInputMap(Node, InputMap)}
+     */
     public static <S extends Node, E extends Event> void installFallback(InputMapTemplate<S, E> imt, S node) {
         Nodes.addFallbackInputMap(node, imt.instantiate(node));
     }
 
+    /**
+     * Instantiates the input map and installs it into the node via {@link Nodes#addFallbackInputMap(Node, InputMap)}
+     */
     public static <S, N extends Node, E extends Event> void installFallback(InputMapTemplate<S, E> imt, S target, Function<? super S, ? extends N> getNode) {
         Nodes.addFallbackInputMap(getNode.apply(target), imt.instantiate(target));
     }
 
+    /**
+     * Removes the input map template's instance from the given node.
+     */
     public static <S extends Node, E extends Event> void uninstall(InputMapTemplate<S, E> imt, S node) {
         Nodes.removeInputMap(node, imt.instantiate(node));
     }
 
+    /**
+     * Removes the input map template's instance from the given node.
+     */
     public static <S, N extends Node, E extends Event> void uninstall(InputMapTemplate<S, E> imt, S target, Function<? super S, ? extends N> getNode) {
         Nodes.removeInputMap(getNode.apply(target), imt.instantiate(target));
     }

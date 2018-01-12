@@ -6,6 +6,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
+/**
+ * A helper class for pattern-matching a KeyEvent's {@link KeyCombination.Modifier modifiers} along with
+ * the key event itself.
+ */
 class KeyCodePatternCombination extends KeyCombination {
 
     private final Predicate<KeyCode> keyTest;

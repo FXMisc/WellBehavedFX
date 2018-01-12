@@ -14,21 +14,40 @@ import javafx.scene.Node;
 
 import org.fxmisc.wellbehaved.event.InputMap.HandlerConsumer;
 
+/**
+ * Helper class for "installing/uninstalling" an {@link InputMap} into a {@link Node}. To add an {@link InputMap}
+ * as a default behavior that can be overridden later, use {@link #addFallbackInputMap(Node, InputMap)}.
+ * To add an {@code InputMap} that might override default behaviors, use {@link #addInputMap(Node, InputMap)}. To
+ * remove an {@code InputMap}, use {@link #removeInputMap(Node, InputMap)}.
+ */
 public class Nodes {
 
     private static final String P_INPUTMAP = "org.fxmisc.wellbehaved.event.inputmap";
     private static final String P_HANDLERS = "org.fxmisc.wellbehaved.event.handlers";
 
+    /**
+     * Adds the given input map to the start of the node's list of input maps, so that an event will be pattern-matched
+     * against the given input map before being pattern-matched against any other input maps currently
+     * "installed" in the node.
+     */
     public static void addInputMap(Node node, InputMap<?> im) {
         init(node);
         setInputMap(node, InputMap.sequence(im, getInputMap(node)));
     }
 
+    /**
+     * Adds the given input map to the end of the node's list of input maps, so that an event will be pattern-matched
+     * against all other input maps currently "installed" in the node before being pattern-matched against the given
+     * input map.
+     */
     public static void addFallbackInputMap(Node node, InputMap<?> im) {
         init(node);
         setInputMap(node, InputMap.sequence(getInputMap(node), im));
     }
 
+    /**
+     * Removes (or uninstalls) the given input map from the node.
+     */
     public static void removeInputMap(Node node, InputMap<?> im) {
         setInputMap(node, getInputMap(node).without(im));
     }
@@ -42,6 +61,10 @@ public class Nodes {
         node.getProperties().put(P_INPUTMAP, im);
     }
 
+    /**
+     *
+     * @param node
+     */
     private static void init(Node node) {
         if(node.getProperties().get(P_INPUTMAP) == null) {
 

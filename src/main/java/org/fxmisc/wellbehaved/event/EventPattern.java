@@ -19,11 +19,55 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * Helper class for pattern-matching one or more {@link EventType}s (e.g. the "case" line in a powerful switch
+ * statement). When {@link #match(Event)} returns a non-empty {@link Optional}, the corresponding
+ * {@link InputHandler} will be called.
+ *
+ * <h2>Usages</h2>
+ * <p>
+ *     This class provides a number of static factory methods that provide the base pattern to match.
+ * </p>
+ * <ul>
+ *     <li>
+ *         <em>Most will use the ones for the common event types:</em> {@link #keyPressed()}, {@link #keyTyped()},
+ *         {@link #mousePressed()}, {@link #mouseClicked()}, {@link #mouseDragged()}, etc.
+ *     </li>
+ *     <li>
+ *         <em>For custom events or super event types (e.g. {@link javafx.scene.input.InputEvent#ANY}),</em> one
+ *         will use the base pattern, {@link #eventType(EventType)}
+ *     </li>
+ * </ul>
+ *
+ * <p>
+ *     Once a base pattern is created, one can further define the pattern for which to match for by
+ *     adding what are known as "guards" in pattern matching: {@link #andThen(EventPattern)},
+ *     {@link #onlyIf(Predicate)}, {@link #unless(Predicate)}, and {@link #anyOf(EventPattern[])}. See each
+ *     method's javadoc for more info.
+ * </p>
+ *
+ * <h2>Examples</h2>
+ * <pre><code>
+ * // a pattern that matches any key pressed event
+ * keyPressed()
+ *
+ * // a pattern that matches only key pressed events where the user
+ * // pressed a digit key
+ * keyPressed().onlyIf(pressedKey -&gt; pressedKey.getCode().isDigitKey())
+ * </code></pre>
+ */
 public interface EventPattern<T extends Event, U extends T> {
 
+    /**
+     * Returns a non-empty {@link Optional} when a match is found.
+     */
     Optional<? extends U> match(T event);
     Set<EventType<? extends U>> getEventTypes();
 
+    /**
+     * Returns an EventPattern that matches the given event type only when this event pattern matches it
+     * and the {@code next} EventPattern matches it.
+     */
     default <V extends U> EventPattern<T, V> andThen(EventPattern<? super U, V> next) {
         return new EventPattern<T, V>() {
 
@@ -39,6 +83,10 @@ public interface EventPattern<T extends Event, U extends T> {
         };
     }
 
+    /**
+     * Returns an EventPattern that matches the given event type only if this event pattern matches it
+     * and the event type passed the given {@code condition}
+     */
     default EventPattern<T, U> onlyIf(Predicate<? super U> condition) {
         return new EventPattern<T, U>() {
 
@@ -55,10 +103,19 @@ public interface EventPattern<T extends Event, U extends T> {
         };
     }
 
+    /**
+     * Returns an EventPattern that matches the given event type only if this event pattern matches it
+     * and the event type fails the given {@code condition}
+     */
     default EventPattern<T, U> unless(Predicate<? super U> condition) {
         return onlyIf(condition.negate());
     }
 
+    /**
+     * Returns an EventPattern that matches the given event type when any of the given EventPatterns match the
+     * given event type; useful when one wants to specify the same behavior for a variety of events (i.e. the
+     * "copy" action when a user press "CTRL+C" on Windows or "COMMAND+C" on Mac).
+     */
     @SafeVarargs
     static <T extends Event, U extends T> EventPattern<T, U> anyOf(EventPattern<T, ? extends U>... events) {
         return new EventPattern<T, U>() {

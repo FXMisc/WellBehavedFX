@@ -6,8 +6,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 /**
- * The purpose of this class is to reuse the modifier-matching implementation
- * from KeyCombination.
+ * A helper class for pattern-matching a Key Typed event's {@link KeyCombination.Modifier modifiers} along with
+ * the key event itself.
  */
 class KeyTypedCombination extends KeyCombination {
     private final Predicate<String> charTest;
