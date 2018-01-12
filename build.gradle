@@ -2,22 +2,12 @@ version = '0.3.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
-    }
-}
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 repositories {
     mavenCentral()
 }
-
-apply from: 'gradle/publish.gradle'
 
 group = 'org.fxmisc.wellbehaved'
 project.archivesBaseName = 'wellbehavedfx'
@@ -28,6 +18,12 @@ targetCompatibility = '1.8'
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '[4.0,)'
     testCompile group: 'org.hamcrest', name: 'hamcrest-junit', version: '2.0.0.0'
+
+    // TestFX dependencies
+    testCompile ("org.testfx:testfx-junit:4.0.8-alpha") {
+        exclude(group: "junit", module: "junit")
+    }
+    testCompile "org.testfx:openjfx-monocle:8u76-b04"
 }
 
 javadoc {
@@ -44,6 +40,77 @@ javadoc {
     ]
 }
 
-task getVersion << {
-  println version
+task getVersion {
+    doLast {
+        println version
+    }
 }
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+signArchives.onlyIf {
+    project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
+}
+
+def doUploadArchives = project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')
+
+if(doUploadArchives) {
+    uploadArchives {
+        repositories.mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'WellBehavedFX'
+                description 'Composable event handlers and skin skeletons for JavaFX controls.'
+                url 'http://www.fxmisc.org/wellbehaved/'
+                packaging 'jar'
+                licenses {
+                    license {
+                        name 'The BSD 2-Clause License'
+                        url 'http://opensource.org/licenses/BSD-2-Clause'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    url 'scm:git@github.com:FXMisc/WellBehavedFX.git'
+                    connection 'scm:git@github.com:FXMisc/WellBehavedFX.git'
+                    developerConnection 'scm:git@github.com:FXMisc/WellBehavedFX.git'
+                }
+                developers {
+                    developer {
+                        name 'Tomas Mikula'
+                    }
+                }
+            }
+        }
+    }
+}
+
+uploadArchives.onlyIf { doUploadArchives }
