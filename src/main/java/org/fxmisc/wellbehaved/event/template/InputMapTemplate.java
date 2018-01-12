@@ -174,14 +174,34 @@ public abstract class InputMapTemplate<S, E extends Event> {
      * {@link Result#CONSUME}).
      */
     public InputMapTemplate<S, E> ifConsumed(BiConsumer<? super S, ? super E> postConsumption) {
+        return postResult(Result.CONSUME, postConsumption);
+    }
+
+    /**
+     * Executes some additional handler if the event was ignored
+     * (e.g. {@link InputHandlerTemplate#process(Object, Event)} returns {@link Result#IGNORE}).
+     */
+    public InputMapTemplate<S, E> ifIgnored(BiConsumer<? super S, ? super E> postIgnore) {
+        return postResult(Result.IGNORE, postIgnore);
+    }
+
+    /**
+     * Executes some additional handler if the event was consumed (e.g. {@link InputHandler#process(Event)} returns
+     * {@link Result#CONSUME}).
+     */
+    public InputMapTemplate<S, E> ifProcessed(BiConsumer<? super S, ? super E> postProceed) {
+        return postResult(Result.PROCEED, postProceed);
+    }
+
+    private InputMapTemplate<S, E> postResult(Result checkedResult, BiConsumer<? super S, ? super E> postDesiredResult) {
         return new InputMapTemplate<S, E>() {
             @Override
             protected InputHandlerTemplateMap<S, E> getInputHandlerTemplateMap() {
                 return InputMapTemplate.this.getInputHandlerTemplateMap().map(iht -> {
                     return (s, evt) -> {
                         Result res = iht.process(s, evt);
-                        if (res == Result.CONSUME) {
-                            postConsumption.accept(s, evt);
+                        if (res == checkedResult) {
+                            postDesiredResult.accept(s, evt);
                         }
                         return res;
                     };

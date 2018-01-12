@@ -70,7 +70,8 @@ import org.fxmisc.wellbehaved.event.InputHandler.Result;
  *         and {@link #consumeUnless(EventType, BooleanSupplier, Consumer)}
  *     </li>
  *     <li>
- *         The post-conditions: {@link #ifConsumed(Consumer)}.
+ *         The post-conditions: {@link #ifIgnored(Consumer)}, {@link #ifProcessed(Consumer)},
+ *         {@link #ifConsumed(Consumer)}.
  *     </li>
  * </ul>
  *
@@ -170,14 +171,34 @@ public interface InputMap<E extends Event> {
      * {@link Result#CONSUME}).
      */
     default InputMap<E> ifConsumed(Consumer<? super E> postConsumption) {
-        return handlerConsumer -> InputMap.this.forEachEventType(new HandlerConsumer<E>() {
+        return postResult(this, Result.CONSUME, postConsumption);
+    }
+
+    /**
+     * Executes some additional handler if the event was ignored (e.g. {@link InputHandler#process(Event)} returns
+     * {@link Result#IGNORE}).
+     */
+    default InputMap<E> ifIgnored(Consumer<? super E> postIgnore) {
+        return postResult(this, Result.IGNORE, postIgnore);
+    }
+
+    /**
+     * Executes some additional handler if the event was matched but not consumed
+     * (e.g. {@link InputHandler#process(Event)} returns {@link Result#PROCEED}).
+     */
+    default InputMap<E> ifProcessed(Consumer<? super E> postProceed) {
+        return postResult(this, Result.PROCEED, postProceed);
+    }
+
+    static <E extends Event> InputMap<E> postResult(InputMap<? extends E> map, Result checkedResult, Consumer<? super E> postDesiredResult) {
+        return handlerConsumer -> map.forEachEventType(new HandlerConsumer<E>() {
 
             @Override
             public <T extends E> void accept(EventType<? extends T> t, InputHandler<? super T> h) {
                 InputHandler<T> h2 = e -> {
                     Result res = h.process(e);
-                    if(res == Result.CONSUME) {
-                        postConsumption.accept(e);
+                    if(res == checkedResult) {
+                        postDesiredResult.accept(e);
                     }
                     return res;
                 };
