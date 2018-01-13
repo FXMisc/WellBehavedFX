@@ -1,9 +1,21 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        // Needed only for SNAPSHOT versions
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
+    }
+}
+
 version = '0.3.2-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'io.codearte.nexus-staging'
 
 repositories {
     mavenCentral()
@@ -35,8 +47,8 @@ javadoc {
 
     // resolve links to Java and JavaFX Javadocs
     options.links = [
-        'http://docs.oracle.com/javase/8/docs/api/',
-        'http://docs.oracle.com/javase/8/javafx/api/'
+            'http://docs.oracle.com/javase/8/docs/api/',
+            'http://docs.oracle.com/javase/8/javafx/api/'
     ]
 }
 
@@ -114,3 +126,7 @@ if(doUploadArchives) {
 }
 
 uploadArchives.onlyIf { doUploadArchives }
+
+nexusStaging {
+    packageGroup = "org.fxmisc.wellbehaved"
+}
