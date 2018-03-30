@@ -24,44 +24,71 @@ public class EventPatternTest {
 
     @Test
     public void simpleKeyMatchTest() {
+        // "p" prefix = EventPattern
+        // "e" prefix = KeyEvent
+
         EventPattern<Event, KeyEvent> pAPressed = keyPressed(A);
         EventPattern<Event, KeyEvent> pShiftAPressed = keyPressed(A, SHIFT_DOWN);
         EventPattern<Event, KeyEvent> pAnyShiftAPressed = keyPressed(A, SHIFT_ANY);
         EventPattern<Event, KeyEvent> pCtrlAReleased = keyReleased(A, CONTROL_DOWN);
-        EventPattern<Event, KeyEvent> pMetaATyped = keyTyped("a", META_DOWN);
+        EventPattern<Event, KeyEvent> pMeta_a_Typed = keyTyped("a", META_DOWN);
         EventPattern<Event, KeyEvent> pAltAPressed = keyPressed("a", ALT_DOWN);
         EventPattern<Event, KeyEvent> pNoControlsTyped = keyTyped().onlyIf(e -> !e.isControlDown() && !e.isAltDown() && ! e.isMetaDown());
+        EventPattern<Event, KeyEvent> p_a_Typed = keyTyped("a");
 
-        KeyEvent eAPressed = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
-        KeyEvent eShiftAPressed = new KeyEvent(KEY_PRESSED, "", "", A, true, false, false, false);
-        KeyEvent eShiftAReleased = new KeyEvent(KEY_RELEASED, "", "", A, true, false, false, false);
+        KeyEvent eAPressed          = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
+        KeyEvent eShiftAPressed     = new KeyEvent(KEY_PRESSED, "", "", A, true, false, false, false);
+        KeyEvent eShiftAReleased    = new KeyEvent(KEY_RELEASED, "", "", A, true, false, false, false);
         KeyEvent eShiftMetaAPressed = new KeyEvent(KEY_PRESSED, "", "", A, true, false, false, true);
-        KeyEvent eCtrlAReleased = new KeyEvent(KEY_RELEASED, "", "", A, false, true, false, false);
-        KeyEvent eMetaaTyped = new KeyEvent(KEY_TYPED, "a", "", UNDEFINED, false, false, false, true);
-        KeyEvent eMetaATyped = new KeyEvent(KEY_TYPED, "A", "", UNDEFINED, false, false, false, true);
-        KeyEvent eShiftQTyped = new KeyEvent(KEY_TYPED, "Q", "", UNDEFINED, true, false, false, false);
-        KeyEvent eQTyped = new KeyEvent(KEY_TYPED, "q", "", UNDEFINED, false, false, false, false);
-        KeyEvent eCtrlQTyped = new KeyEvent(KEY_TYPED, "q", "", UNDEFINED, false, true, false, false);
-        KeyEvent eAltAPressed = new KeyEvent(KEY_PRESSED, "", "", A, false, false, true, false);
+        KeyEvent eCtrlAReleased     = new KeyEvent(KEY_RELEASED, "", "", A, false, true, false, false);
+        KeyEvent eMeta_a_Typed      = new KeyEvent(KEY_TYPED, "a", "", UNDEFINED, false, false, false, true);
+        KeyEvent eMeta_A_Typed      = new KeyEvent(KEY_TYPED, "A", "", UNDEFINED, false, false, false, true);
+        KeyEvent eShiftQTyped       = new KeyEvent(KEY_TYPED, "Q", "", UNDEFINED, true, false, false, false);
+        KeyEvent eQTyped            = new KeyEvent(KEY_TYPED, "q", "", UNDEFINED, false, false, false, false);
+        KeyEvent eCtrlQTyped        = new KeyEvent(KEY_TYPED, "q", "", UNDEFINED, false, true, false, false);
+        KeyEvent eAltAPressed       = new KeyEvent(KEY_PRESSED, "", "", A, false, false, true, false);
 
-        assertTrue(pAPressed.match(eAPressed).isPresent());
-        assertTrue(pAPressed.match(eShiftAPressed).isPresent()); // should match even when Shift pressed
-        assertFalse(pShiftAPressed.match(eAPressed).isPresent()); // should not match when Shift not pressed
-        assertFalse(pShiftAPressed.match(eShiftMetaAPressed).isPresent()); // should not match when Meta pressed
-        assertTrue(pShiftAPressed.match(eShiftAPressed).isPresent());
-        assertFalse(pShiftAPressed.match(eShiftAReleased).isPresent()); // released instead of pressed
-        assertFalse(pCtrlAReleased.match(eShiftAReleased).isPresent()); // Shift instead of Control
-        assertTrue(pAnyShiftAPressed.match(eAPressed).isPresent());
-        assertTrue(pAnyShiftAPressed.match(eShiftAPressed).isPresent());
-        assertTrue(pCtrlAReleased.match(eCtrlAReleased).isPresent());
-        assertTrue(pMetaATyped.match(eMetaaTyped).isPresent());
-        assertFalse(pMetaATyped.match(eMetaATyped).isPresent()); // wrong capitalization
-        assertTrue(pNoControlsTyped.match(eShiftQTyped).isPresent());
-        assertTrue(pNoControlsTyped.match(eQTyped).isPresent());
-        assertFalse(pNoControlsTyped.match(eCtrlQTyped).isPresent()); // should not match when Control pressed
+        KeyEvent e_a_Typed          = new KeyEvent(KEY_TYPED, "a", "", UNDEFINED, false, false, false, false);
+        KeyEvent eShift_a_Typed          = new KeyEvent(KEY_TYPED, "a", "", UNDEFINED, true, false, false, false);
+
+        assertMatchSuccess(pAPressed, eAPressed);
+        assertMatchSuccess(pAPressed, eShiftAPressed); // should match even when Shift pressed
+        assertMatchSuccess(pAPressed, eShiftMetaAPressed); // or when any other combo of modifiers pressed
+
+        assertMatchFailure(pShiftAPressed, eAPressed); // should not match when Shift not pressed
+        assertMatchSuccess(pShiftAPressed, eShiftAPressed);
+        assertMatchFailure(pShiftAPressed, eShiftMetaAPressed); // should not match when Meta pressed
+        assertMatchFailure(pShiftAPressed, eShiftAReleased); // released instead of pressed
+        assertMatchFailure(pCtrlAReleased, eShiftAReleased); // Shift instead of Control
+
+        assertMatchSuccess(pAnyShiftAPressed, eAPressed);
+        assertMatchSuccess(pAnyShiftAPressed, eShiftAPressed);
+
+        assertMatchSuccess(pCtrlAReleased, eCtrlAReleased);
+
+        assertMatchSuccess(pMeta_a_Typed, eMeta_a_Typed);
+        assertMatchFailure(pMeta_a_Typed, eMeta_A_Typed); // wrong capitalization
+
+        assertMatchSuccess(pNoControlsTyped, eShiftQTyped);
+        assertMatchSuccess(pNoControlsTyped, eQTyped);
+        assertMatchFailure(pNoControlsTyped, eCtrlQTyped); // should not match when Control pressed
+
         if(!Utils.isMac()) { // https://bugs.openjdk.java.net/browse/JDK-8134723
-            assertTrue(pAltAPressed.match(eAltAPressed).isPresent());
+            assertMatchSuccess(pAltAPressed, eAltAPressed);
         }
+
+        assertMatchSuccess(p_a_Typed, e_a_Typed);
+        assertMatchSuccess(p_a_Typed, eShift_a_Typed);
+        assertMatchSuccess(p_a_Typed, eMeta_a_Typed);
+        assertMatchFailure(p_a_Typed, eMeta_A_Typed); // wrong capitalization
+    }
+
+    private void assertMatchSuccess(EventPattern<Event, KeyEvent> pattern, KeyEvent event) {
+        assertTrue(pattern.match(event).isPresent());
+    }
+
+    private void assertMatchFailure(EventPattern<Event, KeyEvent> pattern, KeyEvent event) {
+        assertFalse(pattern.match(event).isPresent());
     }
 
 }
