@@ -45,7 +45,7 @@ public class EventPatternTest {
         KeyEvent eAltAPressed = new KeyEvent(KEY_PRESSED, "", "", A, false, false, true, false);
 
         assertTrue(pAPressed.match(eAPressed).isPresent());
-        assertFalse(pAPressed.match(eShiftAPressed).isPresent()); // should not match when Shift pressed
+        assertTrue(pAPressed.match(eShiftAPressed).isPresent()); // should match even when Shift pressed
         assertFalse(pShiftAPressed.match(eAPressed).isPresent()); // should not match when Shift not pressed
         assertFalse(pShiftAPressed.match(eShiftMetaAPressed).isPresent()); // should not match when Meta pressed
         assertTrue(pShiftAPressed.match(eShiftAPressed).isPresent());
