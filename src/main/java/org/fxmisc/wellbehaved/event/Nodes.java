@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Stack;
 
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -30,12 +31,17 @@ import org.fxmisc.wellbehaved.event.InputMap.HandlerConsumer;
  *     <li>
  *         To remove an {@code InputMap}, use {@link #removeInputMap(Node, InputMap)}.
  *     </li>
+ *     <li>
+ *         See also {@link #pushInputMap(Node, InputMap)} and {@link #popInputMap(Node)} for temporary behavior
+ *         modification.
+ *     </li>
  * </ul>
  */
 public class Nodes {
 
     private static final String P_INPUTMAP = "org.fxmisc.wellbehaved.event.inputmap";
     private static final String P_HANDLERS = "org.fxmisc.wellbehaved.event.handlers";
+    private static final String P_STACK    = "org.fxmisc.wellbehaved.event.stack";
 
     /**
      * Adds the given input map to the start of the node's list of input maps, so that an event will be pattern-matched
@@ -65,9 +71,44 @@ public class Nodes {
         setInputMapUnsafe(node, getInputMap(node).without(im));
     }
 
-    static InputMap<?> getInputMap(Node node) {
+    /**
+     * Gets the {@link InputMap} for the given node or {@link InputMap#empty()} if there is none.
+     */
+    public static InputMap<?> getInputMap(Node node) {
         init(node);
         return getInputMapUnsafe(node);
+    }
+
+    /**
+     * Removes the currently installed {@link InputMap} (InputMap1) on the given node and installs the {@code im}
+     * (InputMap2) in its place. When finished, InputMap2 can be uninstalled and InputMap1 reinstalled via
+     * {@link #popInputMap(Node)}. Multiple InputMaps can be installed so that InputMap(n) will be installed over
+     * InputMap(n-1)
+     */
+    public static void pushInputMap(Node node, InputMap<?> im) {
+        // store currently installed im; getInputMap calls init
+        InputMap<?> previousInputMap = getInputMap(node);
+        getStack(node).push(previousInputMap);
+
+        // completely override the previous one with the given one
+        setInputMapUnsafe(node, im);
+    }
+
+    /**
+     * If the internal stack has an {@link InputMap}, removes the current {@link InputMap} that was installed
+     * on the give node via {@link #pushInputMap(Node, InputMap)}, reinstalls the previous {@code InputMap},
+     * and then returns true. If the stack is empty, returns false.
+     */
+    public static boolean popInputMap(Node node) {
+        Stack<InputMap<?>> stackedInputMaps = getStack(node);
+        if (!stackedInputMaps.isEmpty()) {
+            // If stack is not empty, node has already been initialized, so can use unsafe methods.
+            // Now, completely override current input map with previous one on stack
+            setInputMapUnsafe(node, stackedInputMaps.pop());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -118,6 +159,17 @@ public class Nodes {
 
     private static List<Map.Entry<EventType<?>, EventHandler<?>>> getHandlers(Node node) {
         return (List<Entry<EventType<?>, EventHandler<?>>>) getProperties(node).get(P_HANDLERS);
+    }
+
+    private static Stack<InputMap<?>> getStack(Node node) {
+        ObservableMap<Object, Object> nodeProperties = getProperties(node);
+        if (nodeProperties.get(P_STACK) == null) {
+            Stack<InputMap<?>> stackedInputMaps = new Stack<>();
+            nodeProperties.put(P_STACK, stackedInputMaps);
+            return stackedInputMaps;
+        }
+
+        return (Stack<InputMap<?>>) nodeProperties.get(P_STACK);
     }
 
     private static ObservableMap<Object, Object> getProperties(Node node) {

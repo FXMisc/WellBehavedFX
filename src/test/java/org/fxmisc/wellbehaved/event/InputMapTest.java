@@ -27,6 +27,8 @@ import org.fxmisc.wellbehaved.event.InputMap.HandlerConsumer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.function.Supplier;
+
 public class InputMapTest {
 
     @BeforeClass
@@ -411,4 +413,49 @@ public class InputMapTest {
         assertEquals(4, counter.get());
         assertFalse(right.isConsumed());
     }
+
+    @Test
+    public void pushAndPopInputMap() {
+        StringProperty res = new SimpleStringProperty();
+
+        Region node = new Region();
+        Nodes.addInputMap(node, InputMap.consume(keyPressed(UP),    e -> res.set("Up")));
+        Supplier<KeyEvent> createUpKeyEvent = () ->
+                new KeyEvent(KEY_PRESSED, "", "", UP, false, false, false, false);
+
+        // regular input map works
+        KeyEvent up = createUpKeyEvent.get();
+
+        dispatch(up, node);
+        assertEquals("Up", res.get());
+        assertTrue(up.isConsumed());
+
+        // temporary input map works
+        Nodes.pushInputMap(node, InputMap.consume(keyPressed(UP), e -> res.set("Down")));
+        up = createUpKeyEvent.get();
+
+        dispatch(up, node);
+        assertEquals("Down", res.get());
+        assertTrue(up.isConsumed());
+
+        // popping reinstalls previous input map
+        Nodes.popInputMap(node);
+        up = createUpKeyEvent.get();
+
+        dispatch(up, node);
+        assertEquals("Up", res.get());
+        assertTrue(up.isConsumed());
+
+        // popping when no temporary input maps exist does nothing
+        Nodes.popInputMap(node);
+        up = createUpKeyEvent.get();
+
+        // set value to something else to insure test works as expected
+        res.set("Other value");
+
+        dispatch(up, node);
+        assertEquals("Up", res.get());
+        assertTrue(up.isConsumed());
+    }
+
 }
