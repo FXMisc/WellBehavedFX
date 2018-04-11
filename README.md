@@ -151,6 +151,83 @@ InputMap<InputEvent> im0 = sequence(
 Nodes.addFallbackInputMap(node, im);
 ```
 
+#### Temporary installation of an InputMap ####
+Suppose one wants to use a given `InputMap` for a node's basic behavior, and upon a specific trigger (e.g. the user presses CTRL+Space), we want the node to have a different behavior temporarily. Once another trigger occurs in this "special behavior" context (e.g. the user presses ESC), we want to revert back to the basic behavior. How can this be done?
+
+````java
+// Basic idea
+InputMap<?> anInputMap = // creation code
+InputMap<?> aTempInputMap = // creation code
+
+// install anInputMap
+Nodes.addInputMap(node, anInputMap);
+// uninstall anInputMap and install aTempInputMap
+Nodes.pushInputMap(node, aTempInputMap);
+// uninstall aTempInputMap and reinstall anInputMap
+Nodes.popInputMap(node);
+````
+
+For example:
+
+````java
+// Special Behavior: refuse to show user a message
+InputMap<Event> specialBehavior = sequence(
+    // individual input maps here
+    consume(
+            keyPressed("a"),
+            e -> System.out.println("We aren't showing you what the user pressed :-p"),
+
+    // handler for reverting back to basic behavior
+    consume(
+        // trigger that will reinstall basic behavior
+        keyPressed(ESC),
+
+        // uninstalls this behavior from this node and reinstalls the basic behavior
+        e -> {
+            boolean basicBehaviorReinstalled = Nodes.popInputMap(this);
+            if (!basicBehaviorReinstalled) {
+                throw new IllegalStateException("Basic behavior was not reinstalled!");
+            }
+    })
+);
+// Basic Behavior: show user a message
+InputMap<Event> basicBehavior = sequence(
+    // individual input maps here
+    consume(
+        keyPressed("a"),
+        e -> System.out.println("The user pressed: " + e.getText()),
+
+    // handler for installing special behavior temporarily
+    consume(
+        // trigger that will install new behavior
+        keyPressed(SPACE, CONTROL),
+
+        e -> Nodes.pushInputMap(this, specialBehavior)
+    )
+);
+Nodes.addInputMap(node, basicBehavior);
+
+// user presses 'A'
+// System outputs: "The user pressed: A"
+
+// user presses CTRL + Space
+// user presses 'A'
+// System outputs: "We aren't showing you what the user pressed :-p"
+
+// user presses 'ESC'
+// user presses 'A'
+// System outputs: "The user pressed: A"
+````
+
+These temporary `InputMap`s can be stacked multiple times, so that one can have multiple contexts:
+- basic context
+  - Up Trigger: when user presses `CTRL+SPACE`, uninstalls this context's behavior and installs `temp context 1`
+- temp context 1
+  - Down Trigger: when user presses `ESC`, uninstalls this context's behavior and reinstalls `basic context`
+  - Up Trigger: when user presses `CTRL+SPACE`, uninstalls this context's behavior and installs `temp context 2`
+- temp context 2
+  - Down Trigger: when user presses `ESC`, uninstalls this context's behavior and reinstalls `temp context 1`
+
 ### Structural sharing between input maps ###
 Consider a control that defines _m_ input mappings and that there are _n_ instances of this control in the scene. The space complexity of all input mappings of all these controls combined is then _O(n*m)_. The goal is to reduce this complexity to _O(m+n)_ by having a shared structure of complexity _O(m)_ of the _m_ input mappings, and each of the _n_ controls to have an input map that is a constant overhead (_O(1)_) on top of this shared structure.
 
