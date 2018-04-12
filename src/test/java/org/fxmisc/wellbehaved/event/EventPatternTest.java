@@ -82,9 +82,7 @@ public class EventPatternTest {
         }
 
         assertMatchSuccess(p_a_Typed, e_a_Typed);
-        assertMatchSuccess(p_a_Typed, eShift_a_Typed);
-        assertMatchSuccess(p_a_Typed, eMeta_a_Typed);
-        assertMatchFailure(p_a_Typed, eMeta_A_Typed); // wrong capitalization
+        assertMatchFailure(p_a_Typed, eShift_a_Typed); // modifier is pressed
     }
 
     private void assertMatchSuccess(EventPattern<Event, KeyEvent> pattern, KeyEvent event) {
