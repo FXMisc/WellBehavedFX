@@ -52,8 +52,8 @@ public class EventPatternTest {
         KeyEvent eShift_a_Typed          = new KeyEvent(KEY_TYPED, "a", "", UNDEFINED, true, false, false, false);
 
         assertMatchSuccess(pAPressed, eAPressed);
-        assertMatchSuccess(pAPressed, eShiftAPressed); // should match even when Shift pressed
-        assertMatchSuccess(pAPressed, eShiftMetaAPressed); // or when any other combo of modifiers pressed
+        assertMatchFailure(pAPressed, eShiftAPressed); // should not match when Shift pressed
+        assertMatchFailure(pAPressed, eShiftMetaAPressed); // or when any other combo of modifiers pressed
 
         assertMatchFailure(pShiftAPressed, eAPressed); // should not match when Shift not pressed
         assertMatchSuccess(pShiftAPressed, eShiftAPressed);
