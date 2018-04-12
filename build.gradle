@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-version = '0.3.2-SNAPSHOT'
+version = '0.3.3-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
