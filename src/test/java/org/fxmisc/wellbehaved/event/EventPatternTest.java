@@ -35,6 +35,7 @@ public class EventPatternTest {
         EventPattern<Event, KeyEvent> pAltAPressed = keyPressed("a", ALT_DOWN);
         EventPattern<Event, KeyEvent> pNoControlsTyped = keyTyped().onlyIf(e -> !e.isControlDown() && !e.isAltDown() && ! e.isMetaDown());
         EventPattern<Event, KeyEvent> p_a_Typed = keyTyped("a");
+        EventPattern<Event, KeyEvent> pLeftBracketTyped = keyTypedNoMod("{");
 
         KeyEvent eAPressed          = new KeyEvent(KEY_PRESSED, "", "", A, false, false, false, false);
         KeyEvent eShiftAPressed     = new KeyEvent(KEY_PRESSED, "", "", A, true, false, false, false);
@@ -46,14 +47,15 @@ public class EventPatternTest {
         KeyEvent eShiftQTyped       = new KeyEvent(KEY_TYPED, "Q", "", UNDEFINED, true, false, false, false);
         KeyEvent eQTyped            = new KeyEvent(KEY_TYPED, "q", "", UNDEFINED, false, false, false, false);
         KeyEvent eCtrlQTyped        = new KeyEvent(KEY_TYPED, "q", "", UNDEFINED, false, true, false, false);
+        KeyEvent eLeftBracketTyped  = new KeyEvent(KEY_TYPED, "{", "", UNDEFINED, true, false, false, true);
         KeyEvent eAltAPressed       = new KeyEvent(KEY_PRESSED, "", "", A, false, false, true, false);
 
         KeyEvent e_a_Typed          = new KeyEvent(KEY_TYPED, "a", "", UNDEFINED, false, false, false, false);
         KeyEvent eShift_a_Typed          = new KeyEvent(KEY_TYPED, "a", "", UNDEFINED, true, false, false, false);
 
         assertMatchSuccess(pAPressed, eAPressed);
-        assertMatchSuccess(pAPressed, eShiftAPressed); // should match even when Shift pressed
-        assertMatchSuccess(pAPressed, eShiftMetaAPressed); // or when any other combo of modifiers pressed
+        assertMatchFailure(pAPressed, eShiftAPressed); // should not match when Shift pressed
+        assertMatchFailure(pAPressed, eShiftMetaAPressed); // or when any other combo of modifiers pressed
 
         assertMatchFailure(pShiftAPressed, eAPressed); // should not match when Shift not pressed
         assertMatchSuccess(pShiftAPressed, eShiftAPressed);
@@ -73,14 +75,14 @@ public class EventPatternTest {
         assertMatchSuccess(pNoControlsTyped, eQTyped);
         assertMatchFailure(pNoControlsTyped, eCtrlQTyped); // should not match when Control pressed
 
+        assertMatchSuccess(pLeftBracketTyped, eLeftBracketTyped);
+
         if(!Utils.isMac()) { // https://bugs.openjdk.java.net/browse/JDK-8134723
             assertMatchSuccess(pAltAPressed, eAltAPressed);
         }
 
         assertMatchSuccess(p_a_Typed, e_a_Typed);
-        assertMatchSuccess(p_a_Typed, eShift_a_Typed);
-        assertMatchSuccess(p_a_Typed, eMeta_a_Typed);
-        assertMatchFailure(p_a_Typed, eMeta_A_Typed); // wrong capitalization
+        assertMatchFailure(p_a_Typed, eShift_a_Typed); // modifier is pressed
     }
 
     private void assertMatchSuccess(EventPattern<Event, KeyEvent> pattern, KeyEvent event) {

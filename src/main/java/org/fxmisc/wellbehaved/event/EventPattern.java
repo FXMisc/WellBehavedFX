@@ -17,6 +17,7 @@ import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -60,6 +61,10 @@ import javafx.scene.input.MouseEvent;
  * </code></pre>
  */
 public interface EventPattern<T extends Event, U extends T> {
+
+    static KeyCombination.Modifier[] ALL_MODIFIERS_AS_ANY = new KeyCombination.Modifier[] {
+            SHORTCUT_ANY, SHIFT_ANY, ALT_ANY, META_ANY
+    };
 
     /**
      * Returns a non-empty {@link Optional} when a match is found.
@@ -180,15 +185,26 @@ public interface EventPattern<T extends Event, U extends T> {
     }
 
     static EventPattern<Event, KeyEvent> keyPressed(KeyCode code, KeyCombination.Modifier... modifiers) {
-        return ReduceDuplicateCode.excludeModifiersIfEmpty(keyPressed(), e -> e.getCode() == code, modifiers);
+        return keyPressed(new KeyCodeCombination(code, modifiers));
     }
 
     static EventPattern<Event, KeyEvent> keyPressed(Predicate<KeyCode> keyTest, KeyCombination.Modifier... modifiers) {
-        return ReduceDuplicateCode.excludeModifiersIfEmpty(keyPressed(), e -> keyTest.test(e.getCode()), modifiers);
+        return keyPressed(new GenericKeyCombination(e -> keyTest.test(e.getCode()), modifiers));
     }
 
     static EventPattern<Event, KeyEvent> keyPressed(String character, KeyCombination.Modifier... modifiers) {
-        return ReduceDuplicateCode.excludeModifiersIfEmpty(keyPressed(), character, modifiers);
+        return keyPressed(new KeyCharacterCombination(character, modifiers));
+    }
+
+    /**
+     * Matches the given key pressed event regardless of modifiers; this should only be used for the rare KeyEvents
+     * which require a pressed modifier (e.g. Shift) to generate it (e.g. "{"). If passed in a regular character
+     * (e.g. "a") and this appears before another EventPattern (e.g. keyPressed("a", SHORTCUT_DOWN)) in an
+     * {@link InputMap#sequence(InputMap[])}, the second EventPattern will never run.
+     */
+    static EventPattern<Event, KeyEvent> keyPressedNoMod(String character) {
+        KeyCharacterCombination combination = new KeyCharacterCombination(character, ALL_MODIFIERS_AS_ANY);
+        return keyPressed().onlyIf(combination::match);
     }
 
     static EventPattern<Event, KeyEvent> keyReleased() {
@@ -200,15 +216,26 @@ public interface EventPattern<T extends Event, U extends T> {
     }
 
     static EventPattern<Event, KeyEvent> keyReleased(KeyCode code, KeyCombination.Modifier... modifiers) {
-        return ReduceDuplicateCode.excludeModifiersIfEmpty(keyReleased(), e -> e.getCode() == code, modifiers);
+        return keyReleased(new KeyCodeCombination(code, modifiers));
     }
 
     static EventPattern<Event, KeyEvent> keyReleased(Predicate<KeyCode> keyTest, KeyCombination.Modifier... modifiers) {
-        return ReduceDuplicateCode.excludeModifiersIfEmpty(keyReleased(), e -> keyTest.test(e.getCode()), modifiers);
+        return keyReleased(new GenericKeyCombination(e -> keyTest.test(e.getCode()), modifiers));
     }
 
     static EventPattern<Event, KeyEvent> keyReleased(String character, KeyCombination.Modifier... modifiers) {
-        return ReduceDuplicateCode.excludeModifiersIfEmpty(keyReleased(), character, modifiers);
+        return keyReleased(new KeyCharacterCombination(character, modifiers));
+    }
+
+    /**
+     * Matches the given key released event regardless of modifiers; this should only be used for the rare KeyEvents
+     * which require a pressed modifier (e.g. Shift) to generate it (e.g. "{"). If passed in a regular character
+     * (e.g. "a") and this appears before another EventPattern (e.g. keyReleased("a", SHORTCUT_DOWN)) in an
+     * {@link InputMap#sequence(InputMap[])}, the second EventPattern will never run.
+     */
+    static EventPattern<Event, KeyEvent> keyReleasedNoMod(String character) {
+        KeyCharacterCombination combination = new KeyCharacterCombination(character, ALL_MODIFIERS_AS_ANY);
+        return keyReleased().onlyIf(combination::match);
     }
 
     static EventPattern<Event, KeyEvent> keyTyped() {
@@ -216,11 +243,22 @@ public interface EventPattern<T extends Event, U extends T> {
     }
 
     static EventPattern<Event, KeyEvent> keyTyped(Predicate<String> charTest, KeyCombination.Modifier... modifiers) {
-        return ReduceDuplicateCode.excludeModifiersIfEmpty(keyTyped(), e -> charTest.test(e.getCharacter()), modifiers);
+        GenericKeyCombination combination = new GenericKeyCombination(e -> charTest.test(e.getCharacter()), modifiers);
+        return keyTyped().onlyIf(combination::match);
     }
 
     static EventPattern<Event, KeyEvent> keyTyped(String character, KeyCombination.Modifier... modifiers) {
         return keyTyped(character::equals, modifiers);
+    }
+
+    /**
+     * Matches the given key typed event regardless of modifiers; this should only be used for the rare KeyEvents
+     * which require a pressed modifier (e.g. Shift) to generate it (e.g. "{"). If passed in a regular character
+     * (e.g. "a") and this appears before another EventPattern (e.g. keyTyped("a", SHORTCUT_DOWN)) in an
+     * {@link InputMap#sequence(InputMap[])}, the second EventPattern will never run.
+     */
+    static EventPattern<Event, KeyEvent> keyTypedNoMod(String character) {
+        return keyTyped().onlyIf(e -> e.getCharacter().equals(character));
     }
 
     static EventPattern<Event, MouseEvent> mouseClicked() {
@@ -273,41 +311,5 @@ public interface EventPattern<T extends Event, U extends T> {
 
     static EventPattern<Event, MouseEvent> mouseExitedTarget() {
         return eventType(MOUSE_EXITED_TARGET);
-    }
-}
-
-class ReduceDuplicateCode {
-
-    private static final KeyCombination.Modifier[] ALL_MODIFIERS_AS_ANY = new KeyCombination.Modifier[] {
-            SHORTCUT_ANY, SHIFT_ANY, ALT_ANY, META_ANY
-    };
-
-    private ReduceDuplicateCode() {
-        throw new IllegalStateException("Cannot instantiate this class");
-    }
-
-    static EventPattern<Event, KeyEvent> excludeModifiersIfEmpty(EventPattern<Event, KeyEvent> pattern,
-                                                                 String character,
-                                                                 KeyCombination.Modifier... modifiers) {
-        // KeyCharacterCombination is required when matching a KeyCode via its character
-        // as its uses package private JavaFX API (Java 8), which is exposed as public in Java 9
-        KeyCharacterCombination combination = new KeyCharacterCombination(
-                character,
-                modifiers.length == 0
-                        ? ALL_MODIFIERS_AS_ANY
-                        : modifiers
-        );
-        return pattern.onlyIf(combination::match);
-    }
-
-    static EventPattern<Event, KeyEvent> excludeModifiersIfEmpty(EventPattern<Event, KeyEvent> pattern,
-                                                                 Predicate<? super KeyEvent> test,
-                                                                 KeyCombination.Modifier... modifiers) {
-        if (modifiers.length == 0) {
-            return pattern.onlyIf(test);
-        } else {
-            GenericKeyCombination combination = new GenericKeyCombination(test, modifiers);
-            return pattern.onlyIf(combination::match);
-        }
     }
 }
