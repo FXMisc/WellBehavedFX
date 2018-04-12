@@ -62,6 +62,10 @@ import javafx.scene.input.MouseEvent;
  */
 public interface EventPattern<T extends Event, U extends T> {
 
+    static KeyCombination.Modifier[] ALL_MODIFIERS_AS_ANY = new KeyCombination.Modifier[] {
+            SHORTCUT_ANY, SHIFT_ANY, ALT_ANY, META_ANY
+    };
+
     /**
      * Returns a non-empty {@link Optional} when a match is found.
      */
@@ -192,6 +196,17 @@ public interface EventPattern<T extends Event, U extends T> {
         return keyPressed(new KeyCharacterCombination(character, modifiers));
     }
 
+    /**
+     * Matches the given key pressed event regardless of modifiers; this should only be used for the rare KeyEvents
+     * which require a pressed modifier (e.g. Shift) to generate it (e.g. "{"). If passed in a regular character
+     * (e.g. "a") and this appears before another EventPattern (e.g. keyPressed("a", SHORTCUT_DOWN)) in an
+     * {@link InputMap#sequence(InputMap[])}, the second EventPattern will never run.
+     */
+    static EventPattern<Event, KeyEvent> keyPressedNoMod(String character) {
+        KeyCharacterCombination combination = new KeyCharacterCombination(character, ALL_MODIFIERS_AS_ANY);
+        return keyPressed().onlyIf(combination::match);
+    }
+
     static EventPattern<Event, KeyEvent> keyReleased() {
         return eventType(KEY_RELEASED);
     }
@@ -212,6 +227,17 @@ public interface EventPattern<T extends Event, U extends T> {
         return keyReleased(new KeyCharacterCombination(character, modifiers));
     }
 
+    /**
+     * Matches the given key released event regardless of modifiers; this should only be used for the rare KeyEvents
+     * which require a pressed modifier (e.g. Shift) to generate it (e.g. "{"). If passed in a regular character
+     * (e.g. "a") and this appears before another EventPattern (e.g. keyReleased("a", SHORTCUT_DOWN)) in an
+     * {@link InputMap#sequence(InputMap[])}, the second EventPattern will never run.
+     */
+    static EventPattern<Event, KeyEvent> keyReleasedNoMod(String character) {
+        KeyCharacterCombination combination = new KeyCharacterCombination(character, ALL_MODIFIERS_AS_ANY);
+        return keyReleased().onlyIf(combination::match);
+    }
+
     static EventPattern<Event, KeyEvent> keyTyped() {
         return eventType(KEY_TYPED);
     }
@@ -223,6 +249,16 @@ public interface EventPattern<T extends Event, U extends T> {
 
     static EventPattern<Event, KeyEvent> keyTyped(String character, KeyCombination.Modifier... modifiers) {
         return keyTyped(character::equals, modifiers);
+    }
+
+    /**
+     * Matches the given key typed event regardless of modifiers; this should only be used for the rare KeyEvents
+     * which require a pressed modifier (e.g. Shift) to generate it (e.g. "{"). If passed in a regular character
+     * (e.g. "a") and this appears before another EventPattern (e.g. keyTyped("a", SHORTCUT_DOWN)) in an
+     * {@link InputMap#sequence(InputMap[])}, the second EventPattern will never run.
+     */
+    static EventPattern<Event, KeyEvent> keyTypedNoMod(String character) {
+        return keyTyped().onlyIf(e -> e.getCharacter().equals(character));
     }
 
     static EventPattern<Event, MouseEvent> mouseClicked() {
