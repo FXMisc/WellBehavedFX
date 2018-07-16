@@ -1,3 +1,5 @@
+**This project is no longer being maintained. See [this issue](https://github.com/FXMisc/WellBehavedFX/issues/22) for more details.**
+
 WellBehavedFX
 =============
 
